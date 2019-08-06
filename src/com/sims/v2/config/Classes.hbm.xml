@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="classes" name="com.sims.v2.model.Classes" table="classes">
+        <id name="id" type="integer">
+            <column length="11" name="id"/>
+            <generator class="increment"/>
+        </id>
+        <property name="name" type="string">
+            <column length="20" name="name"/>
+        </property>
+        <list inverse="true" name="students" >
+            <key>
+                <column length="45" name="id" not-null="true"/>
+            </key>
+            <list-index column="indx" />
+            <one-to-many class="com.sims.v2.model.Student"/>
+        </list>
+        <list inverse="true" name="calendars" cascade="all">
+            <key>
+                <column length="45" name="id" not-null="true"/>
+            </key>
+            <list-index column="indx" />
+            <one-to-many class="com.sims.v2.model.Calendar"/>
+        </list>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="user" name="com.sims.v2.model.User" table="user">
+        <id name="id" type="integer">
+            <column length="11" name="id"/>
+            <generator class="increment"/>
+        </id>
+        <property name="username" type="string">
+            <column length="50" name="username"/>
+        </property>
+        <property name="password" type="string">
+            <column length="100" name="password"/>
+        </property>
+        <property name="role" type="string">
+            <column length="10" name="role"/>
+        </property>
+        <one-to-one name="student" class="com.sims.v2.model.Student"/>
+    </class>
+</hibernate-mapping>

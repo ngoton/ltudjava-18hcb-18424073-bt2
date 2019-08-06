@@ -1,0 +1,20 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/sims?autoReconnect&amp;useUnicode=true&amp;characterEncoding=UTF-8</property>
+        <property name="hibernate.connection.username">admin</property>
+        <property name="hibernate.connection.password">Passw0rd</property>
+        <mapping resource="com/sims/v2/config/User.hbm.xml"/>
+        <mapping resource="com/sims/v2/config/Subject.hbm.xml"/>
+        <mapping resource="com/sims/v2/config/Student.hbm.xml"/>
+        <mapping resource="com/sims/v2/config/Remarking.hbm.xml"/>
+        <mapping resource="com/sims/v2/config/Classes.hbm.xml"/>
+        <mapping resource="com/sims/v2/config/Calendar.hbm.xml"/>
+        <mapping resource="com/sims/v2/config/Attendance.hbm.xml"/>
+        <mapping resource="com/sims/v2/config/Application.hbm.xml"/>
+    </session-factory>
+</hibernate-configuration>
