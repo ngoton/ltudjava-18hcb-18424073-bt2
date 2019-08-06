@@ -2,6 +2,7 @@ package com.sims.v2.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 public class Student implements Serializable {
     private Integer id;
@@ -10,7 +11,7 @@ public class Student implements Serializable {
     private String gender;
     private String idNumber;
     private Classes studentClass;
-    private User user;
+    private Set<Attendance> attendances;
 
     public Integer getId() {
         return id;
@@ -60,12 +61,12 @@ public class Student implements Serializable {
         this.studentClass = studentClass;
     }
 
-    public User getUser() {
-        return user;
+    public Set<Attendance> getAttendances() {
+        return attendances;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setAttendances(Set<Attendance> attendances) {
+        this.attendances = attendances;
     }
 
     @Override

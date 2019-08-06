@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="remarking" name="com.sims.v2.model.Remarking" table="remarking">
+        <id name="id" type="integer">
+            <column length="11" name="id"/>
+            <generator class="increment"/>
+        </id>
+        <property name="opening" type="date">
+            <column name="opening"/>
+        </property>
+        <property name="closing" type="date">
+            <column name="closing"/>
+        </property>
+        <list inverse="true" name="applications">
+            <key>
+                <column length="11" name="remarking_id" not-null="true"/>
+            </key>
+            <list-index column="indx" />
+            <one-to-many class="com.sims.v2.model.Application"/>
+        </list>
+    </class>
+</hibernate-mapping>

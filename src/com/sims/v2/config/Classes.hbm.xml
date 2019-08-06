@@ -13,14 +13,14 @@
         </property>
         <list inverse="true" name="students" >
             <key>
-                <column length="45" name="id" not-null="true"/>
+                <column length="11" name="classes_id" not-null="true"/>
             </key>
             <list-index column="indx" />
             <one-to-many class="com.sims.v2.model.Student"/>
         </list>
         <list inverse="true" name="calendars" cascade="all">
             <key>
-                <column length="45" name="id" not-null="true"/>
+                <column length="11" name="classes_id" not-null="true"/>
             </key>
             <list-index column="indx" />
             <one-to-many class="com.sims.v2.model.Calendar"/>

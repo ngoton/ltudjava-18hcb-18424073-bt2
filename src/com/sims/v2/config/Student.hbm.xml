@@ -22,9 +22,13 @@
         </property>
         <many-to-one class="com.sims.v2.model.Classes"
                      name="studentClass" fetch="join" lazy="false">
-            <column length="11" name="id" not-null="true"/>
+            <column length="11" name="classes_id" not-null="true"/>
         </many-to-one>
-        <one-to-one name="user" class="com.sims.v2.model.User"
-                    cascade="all"/>
+        <set inverse="true" name="attendances" cascade="all">
+            <key>
+                <column length="11" name="student_id" not-null="true"/>
+            </key>
+            <one-to-many class="com.sims.v2.model.Attendance"/>
+        </set>
     </class>
 </hibernate-mapping>

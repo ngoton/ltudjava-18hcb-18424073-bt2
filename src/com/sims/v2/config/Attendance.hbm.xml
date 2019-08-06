@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="attendance" name="com.sims.v2.model.Attendance" table="attendance">
+        <composite-id>
+            <key-many-to-one class="com.sims.v2.model.Student" name="student" column="student_id" lazy="false" />
+            <key-many-to-one name="calendar" class="com.sims.v2.model.Calendar" lazy="false">
+                <column name="classes_id" />
+                <column name="subject_id" />
+            </key-many-to-one>
+        </composite-id>
+        <property name="middleMark" type="float">
+            <column name="middle_mark"/>
+        </property>
+        <property name="finalMark" type="float">
+            <column name="final_mark"/>
+        </property>
+        <property name="otherMark" type="float">
+            <column name="other_mark"/>
+        </property>
+        <property name="mark" type="float">
+            <column name="mark"/>
+        </property>
+    </class>
+</hibernate-mapping>

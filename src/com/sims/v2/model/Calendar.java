@@ -2,11 +2,13 @@ package com.sims.v2.model;
 
 import java.io.Serializable;
 import java.util.Objects;
+import java.util.Set;
 
 public class Calendar implements Serializable {
     private Classes classes;
     private Subject subject;
     private String room;
+    private Set<Attendance> attendances;
 
     public Subject getSubject() {
         return subject;
@@ -32,6 +34,14 @@ public class Calendar implements Serializable {
         this.classes = classes;
     }
 
+    public Set<Attendance> getAttendances() {
+        return attendances;
+    }
+
+    public void setAttendances(Set<Attendance> attendances) {
+        this.attendances = attendances;
+    }
+
     @Override
     public String toString() {
         return this.getClasses().getId() + "|" + this.getSubject().getId() + "|" + this.getRoom();
@@ -51,4 +61,5 @@ public class Calendar implements Serializable {
     public int hashCode(){
         return Objects.hash(classes, subject, room);
     }
+
 }

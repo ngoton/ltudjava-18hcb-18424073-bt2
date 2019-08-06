@@ -3,11 +3,13 @@ package com.sims.v2.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+import java.util.Set;
 
 public class Remarking implements Serializable {
     private Integer id;
     private Date opening;
     private Date closing;
+    private Set<Application> applications;
 
     public Integer getId() {
         return id;
@@ -33,6 +35,14 @@ public class Remarking implements Serializable {
         this.closing = closing;
     }
 
+    public Set<Application> getApplications() {
+        return applications;
+    }
+
+    public void setApplications(Set<Application> applications) {
+        this.applications = applications;
+    }
+
     @Override
     public String toString() {
         return this.getId() + "|" + this.getOpening() + "|" + this.getClosing();
@@ -52,4 +62,5 @@ public class Remarking implements Serializable {
     public int hashCode(){
         return Objects.hash(getId(), opening, closing);
     }
+
 }

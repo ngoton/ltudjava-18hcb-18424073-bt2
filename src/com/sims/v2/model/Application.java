@@ -16,6 +16,7 @@ public class Application implements Serializable {
     private Float newMark;
     private String status;
     private Remarking remarking;
+    private Attendance attendance;
 
     public Integer getId() {
         return id;
@@ -113,6 +114,14 @@ public class Application implements Serializable {
         this.remarking = remarking;
     }
 
+    public Attendance getAttendance() {
+        return attendance;
+    }
+
+    public void setAttendance(Attendance attendance) {
+        this.attendance = attendance;
+    }
+
     @Override
     public boolean equals(Object o){
         if (this == o) return true;
@@ -135,4 +144,5 @@ public class Application implements Serializable {
     public int hashCode(){
         return Objects.hash(getId(), reason, middleExpect, finalExpect, otherExpect, markExpect, newMiddle, newFinal, newOther, newMark, status);
     }
+
 }

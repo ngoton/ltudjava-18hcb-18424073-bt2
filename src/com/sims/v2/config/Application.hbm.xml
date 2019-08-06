@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class catalog="application" name="com.sims.v2.model.Application" table="application">
+        <id name="id" type="integer">
+            <column length="11" name="id"/>
+            <generator class="increment"/>
+        </id>
+        <property name="reason" type="string">
+            <column length="200" name="reason"/>
+        </property>
+        <property name="middleExpect" type="float">
+            <column name="middle_expect"/>
+        </property>
+        <property name="finalExpect" type="float">
+            <column name="final_expect"/>
+        </property>
+        <property name="otherExpect" type="float">
+            <column name="other_expect"/>
+        </property>
+        <property name="markExpect" type="float">
+            <column name="mark_expect"/>
+        </property>
+        <property name="newMiddle" type="float">
+            <column name="new_middle"/>
+        </property>
+        <property name="newFinal" type="float">
+            <column name="new_final"/>
+        </property>
+        <property name="newOther" type="float">
+            <column name="new_other"/>
+        </property>
+        <property name="newMark" type="float">
+            <column name="new_mark"/>
+        </property>
+        <property name="status" type="string">
+            <column length="20" name="status"/>
+        </property>
+        <many-to-one class="com.sims.v2.model.Remarking"
+                     name="remarking" fetch="join" lazy="false">
+            <column length="11" name="remarking_id" not-null="true"/>
+        </many-to-one>
+        <many-to-one name="attendance" class="com.sims.v2.model.Attendance"
+                     column="attendance_id" unique="true" not-null="true"/>
+    </class>
+</hibernate-mapping>

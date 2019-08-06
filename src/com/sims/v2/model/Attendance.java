@@ -10,7 +10,6 @@ public class Attendance implements Serializable {
     private Float finalMark;
     private Float otherMark;
     private Float mark;
-    private Application application;
 
     public Student getStudent() {
         return student;
@@ -58,14 +57,6 @@ public class Attendance implements Serializable {
 
     public void setMark(Float mark) {
         this.mark = mark;
-    }
-
-    public Application getApplication() {
-        return application;
-    }
-
-    public void setApplication(Application application) {
-        this.application = application;
     }
 
     @Override

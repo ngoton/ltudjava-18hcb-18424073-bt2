@@ -17,6 +17,7 @@
         <property name="role" type="string">
             <column length="10" name="role"/>
         </property>
-        <one-to-one name="student" class="com.sims.v2.model.Student"/>
+        <many-to-one name="student" class="com.sims.v2.model.Student"
+                     column="student_id" unique="true"/>
     </class>
 </hibernate-mapping>
