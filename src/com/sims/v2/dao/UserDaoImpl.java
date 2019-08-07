@@ -2,13 +2,18 @@ package com.sims.v2.dao;
 
 import com.sims.v2.model.Student;
 import com.sims.v2.model.User;
+import com.sims.v2.model.User_;
+import com.sims.v2.util.HibernateUtil;
 import com.sims.v2.util.MD5Encrypt;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+import javax.persistence.criteria.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDaoImpl extends IOFileDao implements UserDao {
-    private static String userFile = "data/user.txt";
+public class UserDaoImpl implements UserDao {
 
     public UserDaoImpl() {
     }
@@ -16,37 +21,43 @@ public class UserDaoImpl extends IOFileDao implements UserDao {
     @Override
     public User login(String username, String password){
         String pass = MD5Encrypt.convertHashToString(password);
-
-        List<User> users = getList();
         User user = null;
-        for (User item : users){
-            if (username.equals(item.getUsername()) && pass.equals(item.getPassword())){
-                user = item;
-                break;
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<User> criteria = builder.createQuery(User.class);
+            Root<User> userRoot = criteria.from(User.class);
+            criteria.select(userRoot);
+            criteria.where(builder.equal(userRoot.get(User_.username), username ));
+            user = session.createQuery(criteria).uniqueResult();
+            if (user != null){
+                if (!pass.equals(user.getPassword())) {
+                    return null;
+                }
             }
-        }
 
+        } catch (HibernateException ex) {
+            System.err.println(ex);
+        } finally {
+            session.close();
+        }
         return user;
     }
 
     @Override
     public List<User> getList(){
         List<User> list = new ArrayList<>();
-        List<String[]> data = readFile(userFile, "\\|");
-        for (String[] arr : data){
-            User user = new User();
-            user.setId(Integer.parseInt(arr[0]));
-            user.setUsername(arr[1]);
-            user.setPassword(arr[2]);
-            user.setRole(arr[3]);
-
-            StudentDao studentDao = new StudentDaoImpl();
-            Student student = studentDao.getStudentById(Integer.parseInt(arr[4]));
-            if (student != null){
-                user.setStudent(student);
-            }
-
-            list.add(user);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<User> criteria = builder.createQuery(User.class);
+            Root<User> userRoot = criteria.from(User.class);
+            criteria.select(userRoot);
+            list = session.createQuery(criteria).getResultList();
+        } catch (HibernateException ex) {
+            System.err.println(ex);
+        } finally {
+            session.close();
         }
 
         return list;
@@ -54,82 +65,119 @@ public class UserDaoImpl extends IOFileDao implements UserDao {
 
     @Override
     public User getUserById(Integer id){
-        List<User> users = getList();
         User user = null;
-        for (User u : users){
-            if (id.equals(u.getId())){
-                user = u;
-                break;
-            }
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            user = session.get(User.class, id);
+        } catch (HibernateException ex) {
+            System.err.println(ex);
+        } finally {
+            session.close();
         }
         return user;
     }
 
     @Override
     public User getUserByName(Student student){
-        List<User> users = getList();
         User user = null;
-        for (User u : users){
-            if (u.getStudent() != null){
-                if (student.getId().equals(u.getStudent().getId())){
-                    user = u;
-                    break;
-                }
-            }
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<User> criteria = builder.createQuery(User.class);
+            Root<User> userRoot = criteria.from(User.class);
+            criteria.select(userRoot);
+            criteria.where(builder.equal(userRoot.get(User_.student), student ));
+            user = session.createQuery(criteria).uniqueResult();
+        } catch (HibernateException ex) {
+            System.err.println(ex);
+        } finally {
+            session.close();
         }
         return user;
     }
 
     @Override
     public boolean addOne(User user){
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-        return writeFile(userList, userFile, true);
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            transaction.begin();
+            session.save(user);
+            transaction.commit();
+            return true;
+        } catch (HibernateException ex) {
+            transaction.rollback();
+            System.err.println(ex);
+        } finally {
+            session.close();
+        }
+        return false;
     }
 
     @Override
     public boolean updateOne(User user){
-        List<User> users = getList();
-        List<User> userList = new ArrayList<>();
-        for(User u : users){
-            if (u.getId().equals(user.getId())){
-                u.setUsername(user.getUsername());
-            }
-            userList.add(u);
-        }
+        return updateField(user);
+    }
 
-        return writeFile(userList, userFile, false);
+    @Override
+    public boolean deleteOne(User user){
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaDelete<User> criteriaDelete = builder.createCriteriaDelete(User.class);
+            Root<User> userRoot = criteriaDelete.from(User.class);
+            criteriaDelete.where(builder.equal(userRoot.get(User_.id), user.getId()));
+            transaction.begin();
+            session.createQuery(criteriaDelete).executeUpdate();
+            transaction.commit();
+            return true;
+        } catch (HibernateException ex) {
+            transaction.rollback();
+            System.err.println(ex);
+        } finally {
+            session.close();
+        }
+        return false;
     }
 
     @Override
     public boolean deleteAll(List<User> users){
-        return writeFile(users, userFile, false);
-    }
-
-    @Override
-    public boolean changeName(Integer id, String name){
-        List<User> users = getList();
-        List<User> userList = new ArrayList<>();
-        for (User u : users){
-            if (u.getId().equals(id)){
-                u.setUsername(name);
-            }
-            userList.add(u);
+        List<User> list = getList();
+        list.removeAll(users);
+        for (User user : list){
+            deleteOne(user);
         }
-        return writeFile(userList, userFile, false);
+        return true;
     }
 
     @Override
     public boolean changePassword(User user){
-        List<User> users = getList();
-        List<User> userList = new ArrayList<>();
-        for (User u : users){
-            if (u.getId().equals(user.getId())){
-                u.setPassword(MD5Encrypt.convertHashToString(user.getPassword()));
+        return updateField(user);
+    }
+
+    private boolean updateField(User user){
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = session.beginTransaction();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaUpdate<User> criteriaUpdate = builder.createCriteriaUpdate(User.class);
+            Root<User> userRoot = criteriaUpdate.from(User.class);
+            criteriaUpdate.set(userRoot.get(User_.username), user.getUsername());
+            criteriaUpdate.set(userRoot.get(User_.password), MD5Encrypt.convertHashToString(user.getPassword()));
+            criteriaUpdate.where(builder.equal(userRoot.get(User_.id), user.getId()));
+            if (!transaction.isActive()){
+                transaction.begin();
             }
-            userList.add(u);
+            session.createQuery(criteriaUpdate).executeUpdate();
+            transaction.commit();
+            return true;
+        } catch (HibernateException ex) {
+            transaction.rollback();
+            System.err.println(ex);
+        } finally {
+            session.close();
         }
-        writeFile(userList, userFile, false);
-        return true;
+        return false;
     }
 }

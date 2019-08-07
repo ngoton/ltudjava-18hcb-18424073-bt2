@@ -7,7 +7,7 @@ public class HibernateUtil {
     private static final SessionFactory sessionFactory;
     static {
         try {
-            sessionFactory = new Configuration().configure("./config/hibernate.cfg.xml").buildSessionFactory();
+            sessionFactory = new Configuration().configure("com/sims/v2/config/hibernate.cfg.xml").buildSessionFactory();
         } catch (Throwable ex) {
             System.err.println("Initial SessionFactory creation failed." + ex);
             throw new ExceptionInInitializerError(ex);

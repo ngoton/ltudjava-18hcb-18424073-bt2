@@ -12,7 +12,7 @@ public interface UserDao {
     User getUserByName(Student student);
     boolean addOne(User user);
     boolean updateOne(User user);
+    boolean deleteOne(User user);
     boolean deleteAll(List<User> users);
-    boolean changeName(Integer id, String name);
     boolean changePassword(User user);
 }

@@ -1,14 +1,14 @@
 package com.sims.v2.model;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class Classes implements Serializable {
     private Integer id;
     private String name;
-    private List<Student> students;
-    private List<Calendar> calendars;
+    private Set<Student> students;
+    private Set<Calendar> calendars;
 
     public Integer getId() {
         return id;
@@ -26,19 +26,19 @@ public class Classes implements Serializable {
         this.name = name;
     }
 
-    public List<Student> getStudents() {
+    public Set<Student> getStudents() {
         return students;
     }
 
-    public void setStudents(List<Student> students) {
+    public void setStudents(Set<Student> students) {
         this.students = students;
     }
 
-    public List<Calendar> getCalendars() {
+    public Set<Calendar> getCalendars() {
         return calendars;
     }
 
-    public void setCalendars(List<Calendar> calendars) {
+    public void setCalendars(Set<Calendar> calendars) {
         this.calendars = calendars;
     }
 

@@ -9,6 +9,7 @@ public interface StudentDao {
     Student getStudentById(Integer id);
     Student getStudentByCode(String code);
     boolean save(List<Student> students);
+    boolean deleteOne(Student student);
     boolean deleteAll();
     List<Student> importFile(String path);
 }
