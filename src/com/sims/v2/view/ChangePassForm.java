@@ -84,7 +84,7 @@ public class ChangePassForm extends JPanel {
             passwordField.requestFocus();
         }
         else {
-            user.setPassword(newPass);
+            user.setPassword(MD5Encrypt.convertHashToString(newPass));
             boolean response = loginController.changePassword(user);
             if (response == true){
                 messageLabel.setText("Cập nhật thành công");

@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface StudentService {
     List<Student> getList();
-    boolean save(List<Student> students);
+    boolean create(Student student);
+    boolean update(Student student);
+    boolean delete(Student student);
     boolean deleteAll();
     List<Student> importFile(String path);
 }

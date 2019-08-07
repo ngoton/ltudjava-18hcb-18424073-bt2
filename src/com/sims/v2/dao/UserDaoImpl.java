@@ -101,7 +101,6 @@ public class UserDaoImpl implements UserDao {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         try {
-            transaction.begin();
             session.save(user);
             transaction.commit();
             return true;
@@ -128,7 +127,6 @@ public class UserDaoImpl implements UserDao {
             CriteriaDelete<User> criteriaDelete = builder.createCriteriaDelete(User.class);
             Root<User> userRoot = criteriaDelete.from(User.class);
             criteriaDelete.where(builder.equal(userRoot.get(User_.id), user.getId()));
-            transaction.begin();
             session.createQuery(criteriaDelete).executeUpdate();
             transaction.commit();
             return true;
@@ -164,11 +162,8 @@ public class UserDaoImpl implements UserDao {
             CriteriaUpdate<User> criteriaUpdate = builder.createCriteriaUpdate(User.class);
             Root<User> userRoot = criteriaUpdate.from(User.class);
             criteriaUpdate.set(userRoot.get(User_.username), user.getUsername());
-            criteriaUpdate.set(userRoot.get(User_.password), MD5Encrypt.convertHashToString(user.getPassword()));
+            criteriaUpdate.set(userRoot.get(User_.password), user.getPassword());
             criteriaUpdate.where(builder.equal(userRoot.get(User_.id), user.getId()));
-            if (!transaction.isActive()){
-                transaction.begin();
-            }
             session.createQuery(criteriaUpdate).executeUpdate();
             transaction.commit();
             return true;

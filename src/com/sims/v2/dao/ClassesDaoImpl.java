@@ -76,7 +76,6 @@ public class ClassesDaoImpl implements ClassesDao {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         try {
-            transaction.begin();
             session.save(classes);
             transaction.commit();
             return true;

@@ -189,6 +189,7 @@ public class StudentForm extends JPanel {
             rs = "Vui lòng nhập vào Họ tên!";
             nameField.requestFocus();
         } else {
+            boolean response = false;
             boolean checkId = true;
             List<Student> newList = new ArrayList<>();
             Classes classes = new Classes();
@@ -216,6 +217,9 @@ public class StudentForm extends JPanel {
                         newList.add(s);
                     }
                 }
+                if (checkId == true){
+                    response = controller.update(selectedStudent);
+                }
             } else {
                 for (Student s : list) {
                     if (code.equals(s.getCode())) {
@@ -224,25 +228,19 @@ public class StudentForm extends JPanel {
                     }
                 }
                 if (checkId == true) {
-                    newList = list;
-                    Integer lastId = 0;
-                    if (list.size() > 0) {
-                        lastId = list.get(list.size() - 1).getId();
-                    }
                     Student newStudent = new Student();
-                    newStudent.setId(++lastId);
                     newStudent.setCode(code);
                     newStudent.setName(name);
                     newStudent.setGender(gender);
                     newStudent.setIdNumber(idNumber);
                     newStudent.setStudentClass(classes);
-                    newList.add(newStudent);
+                    response = controller.create(newStudent);
+                    newList = controller.getList();
                 }
 
             }
 
             if (checkId == true) {
-                boolean response = controller.save(newList);
                 if (response == true) {
                     if (selectedStudent != null) {
                         model.setValueAt(code, selectedRowIndex, 1);
@@ -286,18 +284,18 @@ public class StudentForm extends JPanel {
                         newList.add(s);
                     }
                 }
-            }
 
-            boolean response = controller.save(newList);
-            if (response == true) {
-                model.removeRow(selectedRowIndex);
-                model.fireTableDataChanged();
-                studentTable.repaint();
-                rs = "Xóa thành công!";
-                list = newList;
+                boolean response = controller.delete(selectedStudent);
+                if (response == true) {
+                    model.removeRow(selectedRowIndex);
+                    model.fireTableDataChanged();
+                    studentTable.repaint();
+                    rs = "Xóa thành công!";
+                    list = newList;
+                }
+                clickListener.showMessage(rs);
+                this.refresh();
             }
-            clickListener.showMessage(rs);
-            this.refresh();
         }
     }
 

@@ -19,8 +19,18 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public boolean save(List<Student> students){
-        return studentDao.save(students);
+    public boolean create(Student student){
+        return studentDao.addOne(student);
+    }
+
+    @Override
+    public boolean update(Student student){
+        return studentDao.updateOne(student);
+    }
+
+    @Override
+    public boolean delete(Student student){
+        return studentDao.deleteOne(student);
     }
 
     @Override

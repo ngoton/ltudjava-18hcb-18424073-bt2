@@ -8,7 +8,8 @@ public interface StudentDao {
     List<Student> getList();
     Student getStudentById(Integer id);
     Student getStudentByCode(String code);
-    boolean save(List<Student> students);
+    boolean addOne(Student student);
+    boolean updateOne(Student student);
     boolean deleteOne(Student student);
     boolean deleteAll();
     List<Student> importFile(String path);

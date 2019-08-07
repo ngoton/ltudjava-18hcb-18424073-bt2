@@ -29,8 +29,16 @@ public class StudentController {
         return classesService.getList();
     }
 
-    public boolean save(List<Student> students){
-        return studentService.save(students);
+    public boolean create(Student student){
+        return studentService.create(student);
+    }
+
+    public boolean update(Student student){
+        return studentService.update(student);
+    }
+
+    public boolean delete(Student student){
+        return studentService.delete(student);
     }
 
     public boolean deleteAll(){
