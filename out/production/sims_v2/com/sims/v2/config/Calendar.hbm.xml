@@ -5,12 +5,20 @@
 <hibernate-mapping>
     <class catalog="sims" name="com.sims.v2.model.Calendar" table="calendar">
         <composite-id>
-            <key-many-to-one class="com.sims.v2.model.Classes" name="classes" column="classes_id" lazy="false" />
-            <key-many-to-one class="com.sims.v2.model.Subject" name="subject" column="subject_id" lazy="false" />
+            <key-many-to-one name="classes" column="classes_id" class="com.sims.v2.model.Classes"/>
+            <key-many-to-one name="subject" column="subject_id" class="com.sims.v2.model.Subject"/>
         </composite-id>
         <property name="room" type="string">
             <column length="10" name="room"/>
         </property>
+        <many-to-one class="com.sims.v2.model.Classes"
+                     name="classes" fetch="join" lazy="false" insert="false" update="false">
+            <column length="11" name="classes_id" not-null="true"/>
+        </many-to-one>
+        <many-to-one class="com.sims.v2.model.Subject"
+                     name="subject" fetch="join" lazy="false" insert="false" update="false">
+            <column length="11" name="subject_id" not-null="true"/>
+        </many-to-one>
         <set inverse="true" name="attendances" cascade="all">
             <key>
                 <column length="11" name="classes_id" not-null="true"/>

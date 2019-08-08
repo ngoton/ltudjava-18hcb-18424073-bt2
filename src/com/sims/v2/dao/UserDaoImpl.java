@@ -123,11 +123,7 @@ public class UserDaoImpl implements UserDao {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         try {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaDelete<User> criteriaDelete = builder.createCriteriaDelete(User.class);
-            Root<User> userRoot = criteriaDelete.from(User.class);
-            criteriaDelete.where(builder.equal(userRoot.get(User_.id), user.getId()));
-            session.createQuery(criteriaDelete).executeUpdate();
+            session.delete(user);
             transaction.commit();
             return true;
         } catch (HibernateException ex) {

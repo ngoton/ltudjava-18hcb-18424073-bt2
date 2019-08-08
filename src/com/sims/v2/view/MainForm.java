@@ -19,6 +19,8 @@ public class MainForm extends JFrame {
     private ClickListener clickListener;
     private JPanel mainPanel = new JPanel();
     private StudentForm studentPanel = new StudentForm();
+    private CalendarForm calendarPanel = new CalendarForm();
+    private AttendanceForm attendancePanel = new AttendanceForm();
     private ChangePassForm changePassPanel;
 
     public MainForm(boolean isAdmin, User user){
@@ -113,6 +115,8 @@ public class MainForm extends JFrame {
 
         List<MenuBean> menuList = new ArrayList<>();
         menuList.add(new MenuBean(studentPanel, studentButton, "student"));
+        menuList.add(new MenuBean(calendarPanel, calendarButton, "calendar"));
+        menuList.add(new MenuBean(attendancePanel, attendanceButton, "attendance"));
         menuList.add(new MenuBean(changePassPanel, changePassButton, "changepass"));
         menuList.add(new MenuBean(null, loginButton, "login"));
 

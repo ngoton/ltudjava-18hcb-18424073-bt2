@@ -75,6 +75,25 @@ public class StudentDaoImpl extends IOFileDao implements StudentDao {
     }
 
     @Override
+    public List<Student> getStudentByClass(Classes classes){
+        List<Student> list = new ArrayList<>();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Student> criteria = builder.createQuery(Student.class);
+            Root<Student> studentRoot = criteria.from(Student.class);
+            criteria.select(studentRoot);
+            criteria.where(builder.equal(studentRoot.get(Student_.studentClass), classes ));
+            list = session.createQuery(criteria).getResultList();
+        } catch (HibernateException ex) {
+            System.err.println(ex);
+        } finally {
+            session.close();
+        }
+        return list;
+    }
+
+    @Override
     public boolean addOne(Student student){
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
@@ -109,11 +128,7 @@ public class StudentDaoImpl extends IOFileDao implements StudentDao {
         try {
             User user = userDao.getUserByName(student);
             userDao.deleteOne(user);
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaDelete<Student> criteriaDelete = builder.createCriteriaDelete(Student.class);
-            Root<Student> studentRoot = criteriaDelete.from(Student.class);
-            criteriaDelete.where(builder.equal(studentRoot.get(Student_.id), student.getId()));
-            session.createQuery(criteriaDelete).executeUpdate();
+            session.delete(student);
             transaction.commit();
             return true;
         } catch (HibernateException ex) {
