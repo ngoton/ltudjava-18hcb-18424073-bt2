@@ -37,6 +37,33 @@ public class AttendanceDaoImpl extends IOFileDao implements AttendanceDao {
     }
 
     @Override
+    public List<Attendance> getTranscriptList(){
+        List<Attendance> list = new ArrayList<>();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Attendance> criteria = builder.createQuery(Attendance.class);
+            Root<Attendance> attendanceRoot = criteria.from(Attendance.class);
+            attendanceRoot.join(Attendance_.student);
+            attendanceRoot.join(Attendance_.calendar);
+            criteria.select(attendanceRoot);
+            criteria.where( builder.or(
+                    builder.isNotNull(attendanceRoot.get(Attendance_.middleMark)),
+                    builder.isNotNull(attendanceRoot.get(Attendance_.finalMark)),
+                    builder.isNotNull(attendanceRoot.get(Attendance_.otherMark)),
+                    builder.isNotNull(attendanceRoot.get(Attendance_.mark))
+            ));
+            list = session.createQuery(criteria).getResultList();
+        } catch (HibernateException ex) {
+            System.err.println(ex);
+        } finally {
+            session.close();
+        }
+
+        return list;
+    }
+
+    @Override
     public Attendance getAttendanceById(Student student, Calendar calendar){
         Attendance attendance = null;
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -219,6 +246,68 @@ public class AttendanceDaoImpl extends IOFileDao implements AttendanceDao {
         }
 
         list = getList();
+        return list;
+    }
+
+    @Override
+    public List<Attendance> importTranscriptFile(String path) {
+        CalendarDao calendarDao = new CalendarDaoImpl();
+        StudentDao studentDao = new StudentDaoImpl();
+        List<Attendance> list = getList();
+        Student student = null;
+        Calendar calendar = null;
+        List<String[]> data = readFile(path, ",");
+
+        int i = 0;
+        for (String[] arr : data){
+            if (i == 0){
+                String calendarName = arr[0].trim();
+                if (!calendarName.isEmpty()){
+                    calendar = calendarDao.getCalendarByName(calendarName);
+                    if (calendar == null){
+                        return list;
+                    }
+                }
+            }
+            else if (i > 1){
+                boolean checkCode = true;
+                String studentCode = arr[1].trim();
+                if (!studentCode.isEmpty()){
+                    student = studentDao.getStudentByCode(studentCode);
+                    if (student == null){
+                        checkCode = false;
+                    }
+                }
+
+                if (checkCode == true) {
+                    boolean checkExists = false;
+                    Attendance transcript = getAttendanceById(student, calendar);
+                    if (transcript != null) {
+                        transcript.setMiddleMark(Float.parseFloat(arr[3]));
+                        transcript.setFinalMark(Float.parseFloat(arr[4]));
+                        transcript.setOtherMark(Float.parseFloat(arr[5]));
+                        transcript.setMark(Float.parseFloat(arr[6]));
+                        updateOne(transcript);
+                        checkExists = true;
+                    }
+
+                    if (checkExists == false){
+                        Attendance attendance = new Attendance();
+                        attendance.setStudent(student);
+                        attendance.setCalendar(calendar);
+                        attendance.setMiddleMark(Float.parseFloat(arr[3]));
+                        attendance.setFinalMark(Float.parseFloat(arr[4]));
+                        attendance.setOtherMark(Float.parseFloat(arr[5]));
+                        attendance.setMark(Float.parseFloat(arr[6]));
+                        addOne(attendance);
+
+                    }
+                }
+            }
+            i++;
+        }
+
+        list = getTranscriptList();
         return list;
     }
 

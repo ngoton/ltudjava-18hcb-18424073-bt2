@@ -220,6 +220,7 @@ public class TranscriptForm extends JPanel {
         String otherMark = otMarkField.getText().trim();
         String mark = markField.getText().trim();
         boolean checkId = true;
+        boolean response = false;
 
         List<Attendance> newList = new ArrayList<>();
         Calendar calendar = new Calendar();
@@ -246,8 +247,8 @@ public class TranscriptForm extends JPanel {
             selectedTranscript.setOtherMark(Float.parseFloat(otherMark));
             selectedTranscript.setMark(Float.parseFloat(mark));
 
-            for (Transcript s : list) {
-                if (selectedTranscript.getId().equals(s.getId())) {
+            for (Attendance s : list) {
+                if (selectedTranscript.getStudent().equals(s.getStudent()) && selectedTranscript.getCalendar().equals(s.getCalendar())) {
                     newList.add(selectedTranscript);
                 } else {
                     if (studentSelected.equals(s.getStudent().getCode()) && calendarSelected.equals(s.getCalendar().getClasses().getName()+"-"+s.getCalendar().getSubject().getCode())) {
@@ -256,34 +257,44 @@ public class TranscriptForm extends JPanel {
                     }
                     newList.add(s);
                 }
+                if (checkId == true){
+                    response = controller.update(selectedTranscript);
+                }
             }
         } else {
-            for (Transcript s : list) {
+            boolean checkExists = false;
+            for (Attendance s : list) {
                 if (studentSelected.equals(s.getStudent().getCode()) && calendarSelected.equals(s.getCalendar().getClasses().getName()+"-"+s.getCalendar().getSubject().getCode())) {
-                    checkId = false;
+                    if (s.getMiddleMark() == null && s.getFinalMark() == null && s.getOtherMark() == null && s.getMark() == null) {
+                        s.setMiddleMark(Float.parseFloat(middleMark));
+                        s.setFinalMark(Float.parseFloat(finalMark));
+                        s.setOtherMark(Float.parseFloat(otherMark));
+                        s.setMark(Float.parseFloat(mark));
+                        response = controller.update(s);
+                        checkId = true;
+                        checkExists = true;
+                    }
+                    else {
+                        checkId = false;
+                    }
+
                     break;
                 }
             }
-            if (checkId == true) {
-                newList = list;
-                Integer lastId = 0;
-                if (list.size() > 0) {
-                    lastId = list.get(list.size() - 1).getId();
-                }
-                Transcript newTranscript = new Transcript();
-                newTranscript.setId(++lastId);
+            if (checkId == true && checkExists == false) {
+                Attendance newTranscript = new Attendance();
                 newTranscript.setStudent(student);
                 newTranscript.setCalendar(calendar);
                 newTranscript.setMiddleMark(Float.parseFloat(middleMark));
                 newTranscript.setFinalMark(Float.parseFloat(finalMark));
                 newTranscript.setOtherMark(Float.parseFloat(otherMark));
                 newTranscript.setMark(Float.parseFloat(mark));
-                newList.add(newTranscript);
+                response = controller.create(newTranscript);
+                newList = controller.getList();
             }
         }
 
         if (checkId == true) {
-            boolean response = controller.save(newList);
             if (response == true) {
                 if (selectedTranscript != null) {
                     model.setValueAt(studentSelected, selectedRowIndex, 1);
@@ -324,13 +335,17 @@ public class TranscriptForm extends JPanel {
             List<Attendance> newList = new ArrayList<>();
             if (selectedTranscript != null) {
                 for (Attendance s : list) {
-                    if (!selectedTranscript.getId().equals(s.getId())) {
+                    if (!(selectedTranscript.getStudent().equals(s.getStudent()) && selectedTranscript.getCalendar().equals(s.getCalendar()))) {
                         newList.add(s);
                     }
                 }
+                selectedTranscript.setMiddleMark(null);
+                selectedTranscript.setFinalMark(null);
+                selectedTranscript.setOtherMark(null);
+                selectedTranscript.setMark(null);
             }
 
-            boolean response = controller.save(newList);
+            boolean response = controller.update(selectedTranscript);
             if (response == true) {
                 model.removeRow(selectedRowIndex);
                 model.fireTableDataChanged();
@@ -346,7 +361,15 @@ public class TranscriptForm extends JPanel {
     private void clearAll() {
         if (clickListener.deleteClick()) {
             String rs = "Có lỗi xảy ra!";
-            boolean response = controller.deleteAll();
+            List<Attendance> newList = new ArrayList<>();
+            for (Attendance a : list){
+                a.setMiddleMark(null);
+                a.setFinalMark(null);
+                a.setOtherMark(null);
+                a.setMark(null);
+                newList.add(a);
+            }
+            boolean response = controller.deleteAll(newList);
             if (response == true) {
                 list.removeAll(list);
                 model.setRowCount(0);

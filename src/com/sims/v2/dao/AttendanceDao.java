@@ -8,6 +8,7 @@ import java.util.List;
 
 public interface AttendanceDao {
     List<Attendance> getList();
+    List<Attendance> getTranscriptList();
     Attendance getAttendanceById(Student student, Calendar calendar);
     List<Attendance> getAttendanceByCalendar(Calendar calendar);
     List<Attendance> getListByStudent(String code);
@@ -17,4 +18,5 @@ public interface AttendanceDao {
     boolean deleteAll();
     boolean updateAll(List<Attendance> attendances);
     List<Attendance> importFile(String path);
+    List<Attendance> importTranscriptFile(String path);
 }

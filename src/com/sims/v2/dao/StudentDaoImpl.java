@@ -1,9 +1,6 @@
 package com.sims.v2.dao;
 
-import com.sims.v2.model.Classes;
-import com.sims.v2.model.Student;
-import com.sims.v2.model.Student_;
-import com.sims.v2.model.User;
+import com.sims.v2.model.*;
 import com.sims.v2.util.HibernateUtil;
 import com.sims.v2.util.MD5Encrypt;
 import org.hibernate.HibernateException;
@@ -123,11 +120,16 @@ public class StudentDaoImpl extends IOFileDao implements StudentDao {
 
     @Override
     public boolean deleteOne(Student student){
+        AttendanceDao attendanceDao = new AttendanceDaoImpl();
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         try {
             User user = userDao.getUserByName(student);
             userDao.deleteOne(user);
+            List<Attendance> attendances = attendanceDao.getListByStudent(student.getCode());
+            for (Attendance a : attendances){
+                attendanceDao.deleteOne(a);
+            }
             session.delete(student);
             transaction.commit();
             return true;

@@ -10,6 +10,6 @@ public interface TranscriptService {
     boolean create(Attendance attendance);
     boolean update(Attendance attendance);
     boolean delete(Attendance attendance);
-    boolean deleteAll();
+    boolean deleteAll(List<Attendance> attendances);
     List<Attendance> importFile(String path);
 }

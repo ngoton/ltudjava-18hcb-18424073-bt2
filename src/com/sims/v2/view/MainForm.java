@@ -21,7 +21,9 @@ public class MainForm extends JFrame {
     private StudentForm studentPanel = new StudentForm();
     private CalendarForm calendarPanel = new CalendarForm();
     private AttendanceForm attendancePanel = new AttendanceForm();
+    private TranscriptForm transcriptPanel = new TranscriptForm();
     private ChangePassForm changePassPanel;
+    private StudentTranscriptForm transcriptForm;
 
     public MainForm(boolean isAdmin, User user){
         super("QUẢN LÝ SINH VIÊN");
@@ -33,6 +35,7 @@ public class MainForm extends JFrame {
         setPreferredSize(new Dimension(width, height));
         this.userLogined = user;
         this.changePassPanel = new ChangePassForm(user);
+        this.transcriptForm = new StudentTranscriptForm(user);
         addComponentsToPane(isAdmin);
         pack();
         clickListener = new ClickListener();
@@ -117,6 +120,7 @@ public class MainForm extends JFrame {
         menuList.add(new MenuBean(studentPanel, studentButton, "student"));
         menuList.add(new MenuBean(calendarPanel, calendarButton, "calendar"));
         menuList.add(new MenuBean(attendancePanel, attendanceButton, "attendance"));
+        menuList.add(new MenuBean(transcriptPanel, transcriptButton, "transcript"));
         menuList.add(new MenuBean(changePassPanel, changePassButton, "changepass"));
         menuList.add(new MenuBean(null, loginButton, "login"));
 
@@ -147,10 +151,12 @@ public class MainForm extends JFrame {
         mainPanel.add(toolBar, BorderLayout.PAGE_START);
 
         List<MenuBean> menuList = new ArrayList<>();
+        menuList.add(new MenuBean(transcriptForm, transcriptButton, "stTranscript"));
         menuList.add(new MenuBean(changePassPanel, changePassButton, "changepass"));
         menuList.add(new MenuBean(null, loginButton, "login"));
 
         ScreenSwitchController controller = new ScreenSwitchController(this, mainPanel, toolBar);
+        controller.setFirstPanel(transcriptForm, transcriptButton);
         controller.setEvent(menuList);
 
         contentPane.add(mainPanel);

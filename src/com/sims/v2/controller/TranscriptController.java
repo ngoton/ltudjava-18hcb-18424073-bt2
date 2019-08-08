@@ -52,8 +52,8 @@ public class TranscriptController<T> {
         return transcriptService.delete(attendance);
     }
 
-    public boolean deleteAll(){
-        return transcriptService.deleteAll();
+    public boolean deleteAll(List<Attendance> attendances){
+        return transcriptService.deleteAll(attendances);
     }
 
     public List<Attendance> importFile(String path){

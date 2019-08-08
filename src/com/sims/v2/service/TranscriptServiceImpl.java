@@ -15,7 +15,7 @@ public class TranscriptServiceImpl implements TranscriptService {
 
     @Override
     public List<Attendance> getList(){
-        return attendanceDao.getList();
+        return attendanceDao.getTranscriptList();
     }
 
     @Override
@@ -39,13 +39,13 @@ public class TranscriptServiceImpl implements TranscriptService {
     }
 
     @Override
-    public boolean deleteAll(){
-        return attendanceDao.deleteAll();
+    public boolean deleteAll(List<Attendance> attendances){
+        return attendanceDao.updateAll(attendances);
     }
 
     @Override
     public List<Attendance> importFile(String path){
-        return attendanceDao.importFile(path);
+        return attendanceDao.importTranscriptFile(path);
     }
 
 }
