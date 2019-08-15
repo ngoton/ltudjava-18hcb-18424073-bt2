@@ -4,6 +4,7 @@ import com.sims.v2.dao.RemarkingDao;
 import com.sims.v2.dao.RemarkingDaoImpl;
 import com.sims.v2.model.Remarking;
 
+import java.util.Date;
 import java.util.List;
 
 public class RemarkingServiceImpl implements RemarkingService {
@@ -16,6 +17,11 @@ public class RemarkingServiceImpl implements RemarkingService {
     @Override
     public List<Remarking> getList(){
         return remarkingDao.getList();
+    }
+
+    @Override
+    public List<Remarking> getListByDate(Date date){
+        return remarkingDao.getListByDate(date);
     }
 
     @Override

@@ -8,6 +8,7 @@ import org.hibernate.Transaction;
 
 import javax.persistence.criteria.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class RemarkingDaoImpl implements RemarkingDao {
@@ -24,6 +25,29 @@ public class RemarkingDaoImpl implements RemarkingDao {
             CriteriaQuery<Remarking> criteria = builder.createQuery(Remarking.class);
             Root<Remarking> remarkingRoot = criteria.from(Remarking.class);
             criteria.select(remarkingRoot);
+            list = session.createQuery(criteria).getResultList();
+        } catch (HibernateException ex) {
+            System.err.println(ex);
+        } finally {
+            session.close();
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<Remarking> getListByDate(Date date){
+        List<Remarking> list = new ArrayList<>();
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        try {
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Remarking> criteria = builder.createQuery(Remarking.class);
+            Root<Remarking> remarkingRoot = criteria.from(Remarking.class);
+            criteria.select(remarkingRoot);
+            criteria.where(builder.and(
+                    builder.lessThanOrEqualTo(remarkingRoot.get(Remarking_.opening), date),
+                    builder.greaterThanOrEqualTo(remarkingRoot.get(Remarking_.closing), date)
+            ));
             list = session.createQuery(criteria).getResultList();
         } catch (HibernateException ex) {
             System.err.println(ex);

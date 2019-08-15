@@ -25,6 +25,7 @@ public class MainForm extends JFrame {
     private RemarkingForm remarkingPanel = new RemarkingForm();
     private ChangePassForm changePassPanel;
     private StudentTranscriptForm transcriptForm;
+    private ApplicationForm applicationForm;
 
     public MainForm(boolean isAdmin, User user){
         super("QUẢN LÝ SINH VIÊN");
@@ -36,7 +37,6 @@ public class MainForm extends JFrame {
         setPreferredSize(new Dimension(width, height));
         this.userLogined = user;
         this.changePassPanel = new ChangePassForm(user);
-        this.transcriptForm = new StudentTranscriptForm(user);
         addComponentsToPane(isAdmin);
         pack();
         clickListener = new ClickListener();
@@ -63,6 +63,8 @@ public class MainForm extends JFrame {
             setAdminPanel(getContentPane());
         }
         else {
+            this.transcriptForm = new StudentTranscriptForm(userLogined);
+            this.applicationForm = new ApplicationForm(userLogined);
             setUserPanel(getContentPane());
         }
     }
@@ -139,6 +141,7 @@ public class MainForm extends JFrame {
         BorderLayout layout = new BorderLayout();
 
         JButton transcriptButton = new JButton("Bảng điểm");
+        JButton applicationButton = new JButton("Phúc khảo điểm");
         JButton changePassButton = new JButton("Đổi mật khẩu");
 
         String lg = "[ " + userLogined.getUsername() + " ] Đăng xuất";
@@ -146,6 +149,7 @@ public class MainForm extends JFrame {
 
         JToolBar toolBar = new JToolBar();
         toolBar.add(transcriptButton);
+        toolBar.add(applicationButton);
         toolBar.add(changePassButton);
         toolBar.add(Box.createHorizontalGlue());
         toolBar.add(loginButton);
@@ -156,6 +160,7 @@ public class MainForm extends JFrame {
 
         List<MenuBean> menuList = new ArrayList<>();
         menuList.add(new MenuBean(transcriptForm, transcriptButton, "stTranscript"));
+        menuList.add(new MenuBean(applicationForm, applicationButton, "stApplication"));
         menuList.add(new MenuBean(changePassPanel, changePassButton, "changepass"));
         menuList.add(new MenuBean(null, loginButton, "login"));
 
