@@ -115,7 +115,16 @@ public class AttendanceDaoImpl extends IOFileDao implements AttendanceDao {
                 CriteriaQuery<Attendance> criteria = builder.createQuery(Attendance.class);
                 Root<Attendance> attendanceRoot = criteria.from(Attendance.class);
                 criteria.select(attendanceRoot);
-                criteria.where(builder.equal(attendanceRoot.get(Attendance_.student), student ));
+                criteria.where( builder.and(
+                        builder.equal(attendanceRoot.get(Attendance_.student), student ),
+                        builder.or(
+                                builder.isNotNull(attendanceRoot.get(Attendance_.middleMark)),
+                                builder.isNotNull(attendanceRoot.get(Attendance_.finalMark)),
+                                builder.isNotNull(attendanceRoot.get(Attendance_.otherMark)),
+                                builder.isNotNull(attendanceRoot.get(Attendance_.mark))
+                        )
+                        )
+                );
                 list = session.createQuery(criteria).getResultList();
             } catch (HibernateException ex) {
                 System.err.println(ex);

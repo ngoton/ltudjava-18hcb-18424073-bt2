@@ -43,7 +43,7 @@
             <column length="11" name="remarking_id" not-null="true"/>
         </many-to-one>
         <many-to-one name="attendance" class="com.sims.v2.model.Attendance"
-                     unique="true" not-null="true">
+                     lazy="false"  unique="true" not-null="true">
             <column name="student_id" />
             <column name="classes_id" />
             <column name="subject_id" />

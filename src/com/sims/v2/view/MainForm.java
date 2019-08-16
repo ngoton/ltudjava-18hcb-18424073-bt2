@@ -18,11 +18,11 @@ public class MainForm extends JFrame {
     private User userLogined;
     private ClickListener clickListener;
     private JPanel mainPanel = new JPanel();
-    private StudentForm studentPanel = new StudentForm();
-    private CalendarForm calendarPanel = new CalendarForm();
-    private AttendanceForm attendancePanel = new AttendanceForm();
-    private TranscriptForm transcriptPanel = new TranscriptForm();
-    private RemarkingForm remarkingPanel = new RemarkingForm();
+    private StudentForm studentPanel;
+    private CalendarForm calendarPanel;
+    private AttendanceForm attendancePanel;
+    private TranscriptForm transcriptPanel;
+    private RemarkingForm remarkingPanel;
     private ChangePassForm changePassPanel;
     private StudentTranscriptForm transcriptForm;
     private ApplicationForm applicationForm;
@@ -32,8 +32,8 @@ public class MainForm extends JFrame {
         Toolkit toolkit = Toolkit.getDefaultToolkit();
         int xSize = ((int) toolkit.getScreenSize().getWidth());
         int ySize = ((int) toolkit.getScreenSize().getHeight());
-        int height = (int) (Math.round(ySize * 0.80));
-        int width = (int) (Math.round(xSize * 0.80));
+        int height = (int) (Math.round(ySize * 0.85));
+        int width = (int) (Math.round(xSize * 0.85));
         setPreferredSize(new Dimension(width, height));
         this.userLogined = user;
         this.changePassPanel = new ChangePassForm(user);
@@ -41,7 +41,7 @@ public class MainForm extends JFrame {
         pack();
         clickListener = new ClickListener();
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        setResizable(false);
+        setResizable(true);
         setLocationRelativeTo(null);
         setVisible(true);
         beforeExit();
@@ -60,6 +60,11 @@ public class MainForm extends JFrame {
 
     private void addComponentsToPane(boolean isAdmin){
         if (isAdmin){
+            this.studentPanel = new StudentForm();
+            this.calendarPanel = new CalendarForm();
+            this.attendancePanel = new AttendanceForm();
+            this.transcriptPanel = new TranscriptForm();
+            this.remarkingPanel = new RemarkingForm();
             setAdminPanel(getContentPane());
         }
         else {

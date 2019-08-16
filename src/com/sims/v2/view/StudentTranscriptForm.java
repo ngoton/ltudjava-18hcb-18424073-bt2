@@ -186,7 +186,7 @@ public class StudentTranscriptForm extends JPanel {
                                                 .addGap(600, 600, 600)
                                                 .addComponent(searchField)
                                         )
-                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 1000, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 1100, GroupLayout.PREFERRED_SIZE)
                                 )
 
                                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))

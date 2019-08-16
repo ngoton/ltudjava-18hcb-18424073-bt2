@@ -457,7 +457,7 @@ public class AttendanceForm extends JPanel {
                                                 .addGap(200, 200, 200)
                                                 .addComponent(searchField)
                                         )
-                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 700, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 800, GroupLayout.PREFERRED_SIZE)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(deleteButton)
                                                 .addComponent(removeButton)

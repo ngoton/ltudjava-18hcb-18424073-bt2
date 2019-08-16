@@ -3,15 +3,14 @@ package com.sims.v2.view;
 import com.sims.v2.controller.ApplicationController;
 import com.sims.v2.model.*;
 import com.sims.v2.util.ClickListener;
+import com.sims.v2.util.ColumnGroup;
 import com.sims.v2.util.CustomDate;
+import com.sims.v2.util.GroupableTableHeader;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -103,7 +102,9 @@ public class ApplicationForm extends JPanel {
     }
 
     private void loadAttendanceList(){
-        this.attendanceField.setModel(new DefaultComboBoxModel());
+        this.attendanceField.setModel(new DefaultComboBoxModel(
+                new Object[]{"Chọn"}
+        ));
         this.attendanceList = controller.getTranscriptList(user.getUsername());
         this.attendanceFieldModel = (DefaultComboBoxModel) attendanceField.getModel();
         addToAttendanceBox();
@@ -140,6 +141,7 @@ public class ApplicationForm extends JPanel {
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         applicationTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         applicationTable.getColumnModel().getColumn(0).setPreferredWidth(20);
+        applicationTable.getColumnModel().getColumn(1).setPreferredWidth(90);
         applicationTable.addMouseListener(getDataRow());
 
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
@@ -233,6 +235,33 @@ public class ApplicationForm extends JPanel {
         }
     }
 
+
+    private void getTranscriptDetail() {
+        mdMarkField.setText("");
+        fnMarkField.setText("");
+        otMarkField.setText("");
+        markField.setText("");
+
+        String attendanceSelected = attendanceField.getSelectedItem().toString();
+        if (!attendanceSelected.equals("Chọn")) {
+            Attendance transcript = new Attendance();
+            for (Attendance s : attendanceList) {
+                String cl = s.getCalendar().getClasses().getName() + "-" + s.getCalendar().getSubject().getCode();
+                if (cl.equals(attendanceSelected)) {
+                    transcript = s;
+                    break;
+                }
+            }
+
+            if (transcript != null) {
+                mdMarkField.setText(transcript.getMiddleMark().toString());
+                fnMarkField.setText(transcript.getFinalMark().toString());
+                otMarkField.setText(transcript.getOtherMark().toString());
+                markField.setText(transcript.getMark().toString());
+            }
+        }
+    }
+
     private void save() {
         String rs = "Lưu thất bại!";
         String remarkingSelected = remarkingField.getSelectedItem().toString();
@@ -242,13 +271,28 @@ public class ApplicationForm extends JPanel {
         String otherMark = otExpectField.getText().trim();
         String mark = markExpectField.getText().trim();
         String reason = reasonField.getText().trim();
+
+        Float newMiddle = null;
+        Float newFinal = null;
+        Float newOther = null;
+        Float newMark = null;
+
+        if (middleMark != null && !middleMark.isEmpty())
+            newMiddle = Float.parseFloat(middleMark);
+        if (finalMark != null && !finalMark.isEmpty())
+            newFinal = Float.parseFloat(finalMark);
+        if (otherMark != null && !otherMark.isEmpty())
+            newOther = Float.parseFloat(otherMark);
+        if (mark != null && !mark.isEmpty())
+            newMark = Float.parseFloat(mark);
+
         boolean checkId = true;
         boolean response = false;
 
-        if (remarkingSelected == null || remarkingSelected == ""){
+        if (remarkingSelected == null || remarkingSelected.isEmpty()){
             rs = "Không có lịch phúc khảo nào!";
         }
-        else if(attendanceSelected == null || attendanceSelected == ""){
+        else if(attendanceSelected == null || attendanceSelected.isEmpty()){
             rs = "Không có môn nào được chọn!";
         }
         else {
@@ -272,10 +316,10 @@ public class ApplicationForm extends JPanel {
             if (selectedApplication != null) {
                 selectedApplication.setAttendance(attendance);
                 selectedApplication.setRemarking(remarking);
-                selectedApplication.setMiddleExpect(Float.parseFloat(middleMark));
-                selectedApplication.setFinalExpect(Float.parseFloat(finalMark));
-                selectedApplication.setOtherExpect(Float.parseFloat(otherMark));
-                selectedApplication.setMarkExpect(Float.parseFloat(mark));
+                selectedApplication.setMiddleExpect(newMiddle);
+                selectedApplication.setFinalExpect(newFinal);
+                selectedApplication.setOtherExpect(newOther);
+                selectedApplication.setMarkExpect(newMark);
                 selectedApplication.setReason(reason);
 
                 for (Application s : list) {
@@ -293,33 +337,20 @@ public class ApplicationForm extends JPanel {
                     }
                 }
             } else {
-                boolean checkExists = false;
                 for (Application s : list) {
                     if (remarkingSelected.equals(CustomDate.serialize(s.getRemarking().getOpening()) + "-" + CustomDate.serialize(s.getRemarking().getClosing())) && attendanceSelected.equals(s.getAttendance().getCalendar().getClasses().getName() + "-" + s.getAttendance().getCalendar().getSubject().getCode())) {
-                        if (s.getStatus() == null) {
-                            s.setMiddleExpect(Float.parseFloat(middleMark));
-                            s.setFinalExpect(Float.parseFloat(finalMark));
-                            s.setOtherExpect(Float.parseFloat(otherMark));
-                            s.setMarkExpect(Float.parseFloat(mark));
-                            s.setReason(reason);
-                            response = controller.update(s);
-                            checkId = true;
-                            checkExists = true;
-                        } else {
-                            checkId = false;
-                        }
-
+                        checkId = false;
                         break;
                     }
                 }
-                if (checkId == true && checkExists == false) {
+                if (checkId == true) {
                     Application newApplication = new Application();
                     newApplication.setRemarking(remarking);
                     newApplication.setAttendance(attendance);
-                    newApplication.setMiddleExpect(Float.parseFloat(middleMark));
-                    newApplication.setFinalExpect(Float.parseFloat(finalMark));
-                    newApplication.setOtherExpect(Float.parseFloat(otherMark));
-                    newApplication.setMarkExpect(Float.parseFloat(mark));
+                    newApplication.setMiddleExpect(newMiddle);
+                    newApplication.setFinalExpect(newFinal);
+                    newApplication.setOtherExpect(newOther);
+                    newApplication.setMarkExpect(newMark);
                     newApplication.setReason(reason);
                     response = controller.create(newApplication);
                     newList = controller.getList();
@@ -346,8 +377,9 @@ public class ApplicationForm extends JPanel {
                                 mdMarkField.getText(), fnMarkField.getText(), otMarkField.getText(), markField.getText(),
                                 middleMark, finalMark, otherMark, mark,
                                 null, null, null, null,
-                                reason,
-                                remarkingSelected
+                                null,
+                                remarkingSelected,
+                                reason
                         });
                     }
 
@@ -436,10 +468,10 @@ public class ApplicationForm extends JPanel {
         fnMarkLabel = new JLabel("Điểm CK: ");
         otMarkLabel = new JLabel("Điểm khác: ");
         markLabel = new JLabel("Điểm tổng: ");
-        mdExpectLabel = new JLabel("Điểm GK: ");
-        fnExpectLabel = new JLabel("Điểm CK: ");
-        otExpectLabel = new JLabel("Điểm khác: ");
-        markExpectLabel = new JLabel("Điểm tổng: ");
+        mdExpectLabel = new JLabel("Phúc khảo điểm GK: ");
+        fnExpectLabel = new JLabel("Phúc khảo điểm CK: ");
+        otExpectLabel = new JLabel("Phúc khảo điểm khác: ");
+        markExpectLabel = new JLabel("Phúc khảo điểm tổng: ");
         reasonLabel = new JLabel("Lý do: ");
 
         mdMarkField = new JTextField();
@@ -468,6 +500,7 @@ public class ApplicationForm extends JPanel {
         attendanceField = new JComboBox(new DefaultComboBoxModel(
 
         ));
+        attendanceField.addActionListener(e -> getTranscriptDetail());
 
 
         remarkingBox = new JComboBox();
@@ -480,21 +513,48 @@ public class ApplicationForm extends JPanel {
         searchField.getDocument().addDocumentListener(search());
 
         jScrollPane1 = new JScrollPane();
-        applicationTable = new JTable();
-        applicationTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
-        applicationTable.setModel(new DefaultTableModel(
+
+        DefaultTableModel dm = new DefaultTableModel(
                 new Object[][]{
 
                 },
                 new String[]{
                         "STT", "Môn học", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "KQ", "Kỳ", "Lý do"
                 }
-        ) {
+        ){
             @Override
             public boolean isCellEditable(int rowIndex, int colIndex) {
                 return false;
             }
-        });
+        };
+        applicationTable = new JTable( dm ) {
+            protected JTableHeader createDefaultTableHeader() {
+                return new GroupableTableHeader(columnModel);
+            }
+        };
+        TableColumnModel cm = applicationTable.getColumnModel();
+        ColumnGroup g_name = new ColumnGroup("Bảng điểm");
+        g_name.add(cm.getColumn(2));
+        g_name.add(cm.getColumn(3));
+        g_name.add(cm.getColumn(4));
+        g_name.add(cm.getColumn(5));
+        ColumnGroup g_lang = new ColumnGroup("Bảng điểm muốn sửa");
+        g_lang.add(cm.getColumn(6));
+        g_lang.add(cm.getColumn(7));
+        g_lang.add(cm.getColumn(8));
+        g_lang.add(cm.getColumn(9));
+        ColumnGroup g_other = new ColumnGroup("Bảng điểm phúc khảo");
+        g_other.add(cm.getColumn(10));
+        g_other.add(cm.getColumn(11));
+        g_other.add(cm.getColumn(12));
+        g_other.add(cm.getColumn(13));
+
+        GroupableTableHeader header = (GroupableTableHeader)applicationTable.getTableHeader();
+        header.addColumnGroup(g_name);
+        header.addColumnGroup(g_lang);
+        header.addColumnGroup(g_other);
+
+        applicationTable.getTableHeader().setFont(new Font("Arial", Font.BOLD, 14));
 
         jScrollPane1.setViewportView(applicationTable);
 
@@ -511,6 +571,10 @@ public class ApplicationForm extends JPanel {
     }
 
     private void settingLayout(GroupLayout layout) {
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        int xSize = ((int) toolkit.getScreenSize().getWidth());
+        int width = (int) (Math.round(xSize * 0.83));
+
         panel.setLayout(layout);
 
         layout.setHorizontalGroup(
@@ -531,6 +595,7 @@ public class ApplicationForm extends JPanel {
                                                 .addComponent(reasonField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
                                         )
                                 )
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(mdMarkLabel)
@@ -549,6 +614,7 @@ public class ApplicationForm extends JPanel {
                                                 .addComponent(markField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
                                         )
                                 )
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(mdExpectLabel)
@@ -575,24 +641,25 @@ public class ApplicationForm extends JPanel {
                                 .addGap(45, 45, 45)
                                 .addComponent(resetButton, GroupLayout.PREFERRED_SIZE, 90, GroupLayout.PREFERRED_SIZE)
                         )
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addComponent(titleLabel)
 
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(remarkingBox, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(resultBox, GroupLayout.PREFERRED_SIZE, 80, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(resultBox, GroupLayout.PREFERRED_SIZE, 150, GroupLayout.PREFERRED_SIZE)
                                                 .addGap(300, 300, 300)
                                                 .addComponent(searchField)
                                         )
-                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 1200, GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, width, GroupLayout.PREFERRED_SIZE)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(deleteButton)
                                                 .addComponent(removeButton)
                                         )
                                 )
 
-                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        )
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -660,6 +727,7 @@ public class ApplicationForm extends JPanel {
                                                 .addComponent(resetButton)
                                                 .addComponent(saveButton))
                                 )
+                                .addGap(18, 18, 18)
                                 .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
