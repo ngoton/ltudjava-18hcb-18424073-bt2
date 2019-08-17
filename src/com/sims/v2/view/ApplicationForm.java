@@ -174,14 +174,22 @@ public class ApplicationForm extends JPanel {
 
                     attendanceField.setSelectedItem(model.getValueAt(selectedRowIndex, 1).toString());
                     remarkingField.setSelectedItem(model.getValueAt(selectedRowIndex, 15).toString());
-                    mdMarkField.setText(model.getValueAt(selectedRowIndex, 2).toString());
-                    fnMarkField.setText(model.getValueAt(selectedRowIndex, 3).toString());
-                    otMarkField.setText(model.getValueAt(selectedRowIndex, 4).toString());
-                    markField.setText(model.getValueAt(selectedRowIndex, 5).toString());
-                    mdExpectField.setText(model.getValueAt(selectedRowIndex, 6).toString());
-                    fnExpectField.setText(model.getValueAt(selectedRowIndex, 7).toString());
-                    otExpectField.setText(model.getValueAt(selectedRowIndex, 8).toString());
-                    markExpectField.setText(model.getValueAt(selectedRowIndex, 9).toString());
+                    if(model.getValueAt(selectedRowIndex, 2) != null)
+                        mdMarkField.setText(model.getValueAt(selectedRowIndex, 2).toString());
+                    if(model.getValueAt(selectedRowIndex, 3) != null)
+                        fnMarkField.setText(model.getValueAt(selectedRowIndex, 3).toString());
+                    if(model.getValueAt(selectedRowIndex, 4) != null)
+                        otMarkField.setText(model.getValueAt(selectedRowIndex, 4).toString());
+                    if(model.getValueAt(selectedRowIndex, 5) != null)
+                        markField.setText(model.getValueAt(selectedRowIndex, 5).toString());
+                    if(model.getValueAt(selectedRowIndex, 6) != null)
+                        mdExpectField.setText(model.getValueAt(selectedRowIndex, 6).toString());
+                    if(model.getValueAt(selectedRowIndex, 7) != null)
+                        fnExpectField.setText(model.getValueAt(selectedRowIndex, 7).toString());
+                    if(model.getValueAt(selectedRowIndex, 8) != null)
+                        otExpectField.setText(model.getValueAt(selectedRowIndex, 8).toString());
+                    if(model.getValueAt(selectedRowIndex, 9) != null)
+                        markExpectField.setText(model.getValueAt(selectedRowIndex, 9).toString());
                     reasonField.setText(model.getValueAt(selectedRowIndex, 16).toString());
                 }
             }
@@ -272,30 +280,33 @@ public class ApplicationForm extends JPanel {
         String mark = markExpectField.getText().trim();
         String reason = reasonField.getText().trim();
 
-        Float newMiddle = null;
-        Float newFinal = null;
-        Float newOther = null;
-        Float newMark = null;
-
-        if (middleMark != null && !middleMark.isEmpty())
-            newMiddle = Float.parseFloat(middleMark);
-        if (finalMark != null && !finalMark.isEmpty())
-            newFinal = Float.parseFloat(finalMark);
-        if (otherMark != null && !otherMark.isEmpty())
-            newOther = Float.parseFloat(otherMark);
-        if (mark != null && !mark.isEmpty())
-            newMark = Float.parseFloat(mark);
-
-        boolean checkId = true;
-        boolean response = false;
-
         if (remarkingSelected == null || remarkingSelected.isEmpty()){
             rs = "Không có lịch phúc khảo nào!";
         }
         else if(attendanceSelected == null || attendanceSelected.isEmpty()){
             rs = "Không có môn nào được chọn!";
         }
+        else if (reason.isEmpty()){
+            rs = "Vui lòng nhập lý do!";
+        }
         else {
+            Float newMiddle = null;
+            Float newFinal = null;
+            Float newOther = null;
+            Float newMark = null;
+
+            if (middleMark != null && !middleMark.isEmpty())
+                newMiddle = Float.parseFloat(middleMark);
+            if (finalMark != null && !finalMark.isEmpty())
+                newFinal = Float.parseFloat(finalMark);
+            if (otherMark != null && !otherMark.isEmpty())
+                newOther = Float.parseFloat(otherMark);
+            if (mark != null && !mark.isEmpty())
+                newMark = Float.parseFloat(mark);
+
+            boolean checkId = true;
+            boolean response = false;
+
             List<Application> newList = new ArrayList<>();
             Remarking remarking = new Remarking();
             for (Remarking c : remarkingList) {
@@ -323,17 +334,23 @@ public class ApplicationForm extends JPanel {
                 selectedApplication.setReason(reason);
 
                 for (Application s : list) {
-                    if (selectedApplication.getRemarking().equals(s.getRemarking()) && selectedApplication.getAttendance().equals(s.getAttendance())) {
-                        newList.add(selectedApplication);
-                    } else {
-                        if (remarkingSelected.equals(CustomDate.serialize(s.getRemarking().getOpening()) + "-" + CustomDate.serialize(s.getRemarking().getClosing())) && attendanceSelected.equals(s.getAttendance().getCalendar().getClasses().getName() + "-" + s.getAttendance().getCalendar().getSubject().getCode())) {
-                            checkId = false;
-                            break;
+                    if(selectedApplication.getStatus() == null) {
+                        if (selectedApplication.getRemarking().equals(s.getRemarking()) && selectedApplication.getAttendance().equals(s.getAttendance())) {
+                            newList.add(selectedApplication);
+                        } else {
+                            if (remarkingSelected.equals(CustomDate.serialize(s.getRemarking().getOpening()) + "-" + CustomDate.serialize(s.getRemarking().getClosing())) && attendanceSelected.equals(s.getAttendance().getCalendar().getClasses().getName() + "-" + s.getAttendance().getCalendar().getSubject().getCode())) {
+                                checkId = false;
+                                break;
+                            }
+                            newList.add(s);
                         }
-                        newList.add(s);
+                        if (checkId == true) {
+                            response = controller.update(selectedApplication);
+                        }
                     }
-                    if (checkId == true) {
-                        response = controller.update(selectedApplication);
+                    else {
+                        checkId = false;
+                        break;
                     }
                 }
             } else {
@@ -362,10 +379,10 @@ public class ApplicationForm extends JPanel {
                     if (selectedApplication != null) {
                         model.setValueAt(attendanceSelected, selectedRowIndex, 1);
                         model.setValueAt(remarkingSelected, selectedRowIndex, 15);
-                        model.setValueAt(middleMark, selectedRowIndex, 2);
-                        model.setValueAt(finalMark, selectedRowIndex, 3);
-                        model.setValueAt(otherMark, selectedRowIndex, 4);
-                        model.setValueAt(mark, selectedRowIndex, 5);
+                        model.setValueAt(middleMark, selectedRowIndex, 6);
+                        model.setValueAt(finalMark, selectedRowIndex, 7);
+                        model.setValueAt(otherMark, selectedRowIndex, 8);
+                        model.setValueAt(mark, selectedRowIndex, 9);
                         model.setValueAt(reason, selectedRowIndex, 16);
                     } else {
                         Integer i = 0;
