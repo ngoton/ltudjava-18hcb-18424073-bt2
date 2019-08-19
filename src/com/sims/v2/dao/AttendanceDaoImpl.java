@@ -160,9 +160,14 @@ public class AttendanceDaoImpl extends IOFileDao implements AttendanceDao {
 
     @Override
     public boolean deleteOne(Attendance attendance){
+        ApplicationDao applicationDao = new ApplicationDaoImpl();
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         try {
+            List<Application> applicationList = applicationDao.getApplicationByAttendance(attendance);
+            for (Application application : applicationList) {
+                applicationDao.deleteOne(application);
+            }
             session.delete(attendance);
             transaction.commit();
             return true;

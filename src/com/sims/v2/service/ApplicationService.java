@@ -6,8 +6,10 @@ import java.util.List;
 
 public interface ApplicationService {
     List<Application> getList();
+    List<Application> getListByStudent(String code);
     boolean create(Application application);
     boolean update(Application application);
     boolean delete(Application application);
-    boolean deleteAll(String code);
+    boolean deleteAllByStudent(String code);
+    boolean deleteAll();
 }

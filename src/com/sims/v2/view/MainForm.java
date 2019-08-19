@@ -23,6 +23,7 @@ public class MainForm extends JFrame {
     private AttendanceForm attendancePanel;
     private TranscriptForm transcriptPanel;
     private RemarkingForm remarkingPanel;
+    private CheckingForm checkingPanel;
     private ChangePassForm changePassPanel;
     private StudentTranscriptForm transcriptForm;
     private ApplicationForm applicationForm;
@@ -65,6 +66,7 @@ public class MainForm extends JFrame {
             this.attendancePanel = new AttendanceForm();
             this.transcriptPanel = new TranscriptForm();
             this.remarkingPanel = new RemarkingForm();
+            this.checkingPanel = new CheckingForm();
             setAdminPanel(getContentPane());
         }
         else {
@@ -107,6 +109,7 @@ public class MainForm extends JFrame {
         JButton attendanceButton = new JButton("Danh sách lớp");
         JButton transcriptButton = new JButton("Bảng điểm");
         JButton remarkingButton = new JButton("Lịch phúc khảo");
+        JButton checkingButton = new JButton("Danh sách phúc khảo");
         JButton changePassButton = new JButton("Đổi mật khẩu");
 
         String lg = "[ " + userLogined.getUsername() + " ] Đăng xuất";
@@ -118,6 +121,7 @@ public class MainForm extends JFrame {
         toolBar.add(attendanceButton);
         toolBar.add(transcriptButton);
         toolBar.add(remarkingButton);
+        toolBar.add(checkingButton);
         toolBar.add(changePassButton);
         toolBar.add(Box.createHorizontalGlue());
         toolBar.add(loginButton);
@@ -132,6 +136,7 @@ public class MainForm extends JFrame {
         menuList.add(new MenuBean(attendancePanel, attendanceButton, "attendance"));
         menuList.add(new MenuBean(transcriptPanel, transcriptButton, "transcript"));
         menuList.add(new MenuBean(remarkingPanel, remarkingButton, "remarking"));
+        menuList.add(new MenuBean(checkingPanel, checkingButton, "checking"));
         menuList.add(new MenuBean(changePassPanel, changePassButton, "changepass"));
         menuList.add(new MenuBean(null, loginButton, "login"));
 

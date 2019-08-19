@@ -101,13 +101,14 @@ public class RemarkingDaoImpl implements RemarkingDao {
 
     @Override
     public boolean deleteOne(Remarking remarking){
+        ApplicationDao applicationDao = new ApplicationDaoImpl();
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
         try {
-            /*List<Application> applicationList = applicationDao.getApplicationByRemarking(remarking);
+            List<Application> applicationList = applicationDao.getApplicationByRemarking(remarking);
             for (Application application : applicationList) {
                 applicationDao.deleteOne(application);
-            }*/
+            }
             session.delete(remarking);
             transaction.commit();
             return true;

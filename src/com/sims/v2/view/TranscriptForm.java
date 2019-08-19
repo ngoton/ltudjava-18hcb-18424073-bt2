@@ -154,10 +154,14 @@ public class TranscriptForm extends JPanel {
 
                     studentField.setSelectedItem(model.getValueAt(selectedRowIndex, 1).toString());
                     calendarField.setSelectedItem(model.getValueAt(selectedRowIndex, 7).toString());
-                    mdMarkField.setText(model.getValueAt(selectedRowIndex, 3).toString());
-                    fnMarkField.setText(model.getValueAt(selectedRowIndex, 4).toString());
-                    otMarkField.setText(model.getValueAt(selectedRowIndex, 5).toString());
-                    markField.setText(model.getValueAt(selectedRowIndex, 6).toString());
+                    if(model.getValueAt(selectedRowIndex, 3) != null)
+                        mdMarkField.setText(model.getValueAt(selectedRowIndex, 3).toString());
+                    if(model.getValueAt(selectedRowIndex, 4) != null)
+                        fnMarkField.setText(model.getValueAt(selectedRowIndex, 4).toString());
+                    if(model.getValueAt(selectedRowIndex, 5) != null)
+                        otMarkField.setText(model.getValueAt(selectedRowIndex, 5).toString());
+                    if(model.getValueAt(selectedRowIndex, 6) != null)
+                        markField.setText(model.getValueAt(selectedRowIndex, 6).toString());
                 }
             }
 
@@ -219,6 +223,21 @@ public class TranscriptForm extends JPanel {
         String finalMark = fnMarkField.getText().trim();
         String otherMark = otMarkField.getText().trim();
         String mark = markField.getText().trim();
+
+        Float newMiddle = null;
+        Float newFinal = null;
+        Float newOther = null;
+        Float newMark = null;
+
+        if (middleMark != null && !middleMark.isEmpty())
+            newMiddle = Float.parseFloat(middleMark);
+        if (finalMark != null && !finalMark.isEmpty())
+            newFinal = Float.parseFloat(finalMark);
+        if (otherMark != null && !otherMark.isEmpty())
+            newOther = Float.parseFloat(otherMark);
+        if (mark != null && !mark.isEmpty())
+            newMark = Float.parseFloat(mark);
+
         boolean checkId = true;
         boolean response = false;
 
@@ -242,10 +261,10 @@ public class TranscriptForm extends JPanel {
         if (selectedTranscript != null) {
             selectedTranscript.setCalendar(calendar);
             selectedTranscript.setStudent(student);
-            selectedTranscript.setMiddleMark(Float.parseFloat(middleMark));
-            selectedTranscript.setFinalMark(Float.parseFloat(finalMark));
-            selectedTranscript.setOtherMark(Float.parseFloat(otherMark));
-            selectedTranscript.setMark(Float.parseFloat(mark));
+            selectedTranscript.setMiddleMark(newMiddle);
+            selectedTranscript.setFinalMark(newFinal);
+            selectedTranscript.setOtherMark(newOther);
+            selectedTranscript.setMark(newMark);
 
             for (Attendance s : list) {
                 if (selectedTranscript.getStudent().equals(s.getStudent()) && selectedTranscript.getCalendar().equals(s.getCalendar())) {
@@ -266,10 +285,10 @@ public class TranscriptForm extends JPanel {
             for (Attendance s : list) {
                 if (studentSelected.equals(s.getStudent().getCode()) && calendarSelected.equals(s.getCalendar().getClasses().getName()+"-"+s.getCalendar().getSubject().getCode())) {
                     if (s.getMiddleMark() == null && s.getFinalMark() == null && s.getOtherMark() == null && s.getMark() == null) {
-                        s.setMiddleMark(Float.parseFloat(middleMark));
-                        s.setFinalMark(Float.parseFloat(finalMark));
-                        s.setOtherMark(Float.parseFloat(otherMark));
-                        s.setMark(Float.parseFloat(mark));
+                        s.setMiddleMark(newMiddle);
+                        s.setFinalMark(newFinal);
+                        s.setOtherMark(newOther);
+                        s.setMark(newMark);
                         response = controller.update(s);
                         checkId = true;
                         checkExists = true;
@@ -285,10 +304,10 @@ public class TranscriptForm extends JPanel {
                 Attendance newTranscript = new Attendance();
                 newTranscript.setStudent(student);
                 newTranscript.setCalendar(calendar);
-                newTranscript.setMiddleMark(Float.parseFloat(middleMark));
-                newTranscript.setFinalMark(Float.parseFloat(finalMark));
-                newTranscript.setOtherMark(Float.parseFloat(otherMark));
-                newTranscript.setMark(Float.parseFloat(mark));
+                newTranscript.setMiddleMark(newMiddle);
+                newTranscript.setFinalMark(newFinal);
+                newTranscript.setOtherMark(newOther);
+                newTranscript.setMark(newMark);
                 response = controller.create(newTranscript);
                 newList = controller.getList();
             }

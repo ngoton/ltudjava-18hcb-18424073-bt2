@@ -63,6 +63,52 @@ public class ApplicationDaoImpl implements ApplicationDao {
     }
 
     @Override
+    public List<Application> getApplicationByRemarking(Remarking remarking){
+        List<Application> list = new ArrayList<>();
+        if (remarking != null){
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            try {
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<Application> criteria = builder.createQuery(Application.class);
+                Root<Application> applicationRoot = criteria.from(Application.class);
+                Join<Application, Remarking> remarkings = applicationRoot.join( Application_.remarking );
+                criteria.select(applicationRoot);
+                criteria.where(builder.equal(remarkings, remarking ));
+                list = session.createQuery(criteria).getResultList();
+            } catch (HibernateException ex) {
+                System.err.println(ex);
+            } finally {
+                session.close();
+            }
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<Application> getApplicationByAttendance(Attendance attendance){
+        List<Application> list = new ArrayList<>();
+        if (attendance != null){
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            try {
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<Application> criteria = builder.createQuery(Application.class);
+                Root<Application> applicationRoot = criteria.from(Application.class);
+                Join<Application, Attendance> attendances = applicationRoot.join( Application_.attendance );
+                criteria.select(applicationRoot);
+                criteria.where(builder.equal(attendances, attendance ));
+                list = session.createQuery(criteria).getResultList();
+            } catch (HibernateException ex) {
+                System.err.println(ex);
+            } finally {
+                session.close();
+            }
+        }
+
+        return list;
+    }
+
+    @Override
     public boolean addOne(Application application){
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = session.beginTransaction();
@@ -102,8 +148,19 @@ public class ApplicationDaoImpl implements ApplicationDao {
     }
 
     @Override
-    public boolean deleteAll(String code){
+    public boolean deleteAllByStudent(String code){
         List<Application> applications = getListByStudent(code);
+        for (Application application : applications){
+            if (application.getStatus() == null){
+                deleteOne(application);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean deleteAll(){
+        List<Application> applications = getList();
         for (Application application : applications){
             deleteOne(application);
         }

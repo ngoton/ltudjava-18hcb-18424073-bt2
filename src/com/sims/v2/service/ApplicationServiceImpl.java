@@ -20,6 +20,11 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
+    public List<Application> getListByStudent(String code){
+        return applicationDao.getListByStudent(code);
+    }
+
+    @Override
     public boolean create(Application application){
         return applicationDao.addOne(application);
     }
@@ -35,8 +40,12 @@ public class ApplicationServiceImpl implements ApplicationService {
     }
 
     @Override
-    public boolean deleteAll(String code){
-        return applicationDao.deleteAll(code);
+    public boolean deleteAllByStudent(String code){
+        return applicationDao.deleteAllByStudent(code);
     }
 
+    @Override
+    public boolean deleteAll(){
+        return applicationDao.deleteAll();
+    }
 }

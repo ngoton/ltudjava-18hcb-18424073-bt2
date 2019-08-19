@@ -1,7 +1,8 @@
 package com.sims.v2.view;
 
-import com.sims.v2.controller.ApplicationController;
-import com.sims.v2.model.*;
+import com.sims.v2.controller.CheckingController;
+import com.sims.v2.model.Application;
+import com.sims.v2.model.Remarking;
 import com.sims.v2.util.ClickListener;
 import com.sims.v2.util.ColumnGroup;
 import com.sims.v2.util.CustomDate;
@@ -18,30 +19,21 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class ApplicationForm extends JPanel {
-    private User user;
+public class CheckingForm extends JPanel {
     private static Float basicMark = 5.0f;
-    private ApplicationController controller;
+    private CheckingController controller;
     private ClickListener clickListener;
     private List<Application> list;
     DefaultTableModel model;
     private List<Remarking> remarkingList;
-    DefaultComboBoxModel remarkingFieldModel;
     DefaultComboBoxModel remarkingBoxModel;
-    private List<Attendance> attendanceList;
-    DefaultComboBoxModel attendanceFieldModel;
     private JPanel panel;
-    private JButton addButton;
     private JButton saveButton;
     private JButton resetButton;
     private JLabel titleLabel;
-    private JLabel remarkingLabel;
-    private JLabel attendanceLabel;
     private JComboBox remarkingBox;
     private JScrollPane jScrollPane1;
     private JTable applicationTable;
-    private JComboBox remarkingField;
-    private JComboBox attendanceField;
     private JTextField searchField;
     private JButton deleteButton;
     private JButton removeButton;
@@ -61,75 +53,55 @@ public class ApplicationForm extends JPanel {
     private JLabel fnExpectLabel;
     private JLabel otExpectLabel;
     private JLabel markExpectLabel;
-    private JTextField reasonField;
-    private JLabel reasonLabel;
+    private JComboBox statusField;
+    private JLabel statusLabel;
     private JComboBox resultBox;
 
     private TableRowSorter<TableModel> rowSorter;
     private Application selectedApplication;
     private Integer selectedRowIndex;
 
-    public ApplicationForm(User user) {
-        this.user = user;
+    public CheckingForm() {
         initComponents();
         clickListener = new ClickListener();
-        this.controller = new ApplicationController();
-        this.list = controller.getListByStudent(user.getUsername());
+        this.controller = new CheckingController();
+        this.list = controller.getList();
         loadRemarkingList();
-        loadAttendanceList();
         this.model = (DefaultTableModel) applicationTable.getModel();
         showDataTable();
     }
 
     private void loadRemarkingList(){
-        this.remarkingField.setModel(new DefaultComboBoxModel());
         this.remarkingBox.setModel(new DefaultComboBoxModel(
                 new Object[]{"Tất cả"}
         ));
         this.remarkingList = controller.getRemarkingList(new Date());
         this.remarkingBoxModel = (DefaultComboBoxModel) remarkingBox.getModel();
-        this.remarkingFieldModel = (DefaultComboBoxModel) remarkingField.getModel();
         addToRemarkingBox();
     }
 
     private void addToRemarkingBox() {
         for (Remarking remarking : remarkingList) {
-            remarkingFieldModel.addElement(CustomDate.serialize(remarking.getOpening())+"-"+CustomDate.serialize(remarking.getClosing()));
             remarkingBoxModel.addElement(CustomDate.serialize(remarking.getOpening())+"-"+CustomDate.serialize(remarking.getClosing()));
         }
-        remarkingField.setModel(remarkingFieldModel);
         remarkingBox.setModel(remarkingBoxModel);
-    }
-
-    private void loadAttendanceList(){
-        this.attendanceField.setModel(new DefaultComboBoxModel(
-                new Object[]{"Chọn"}
-        ));
-        this.attendanceList = controller.getTranscriptList(user.getUsername());
-        this.attendanceFieldModel = (DefaultComboBoxModel) attendanceField.getModel();
-        addToAttendanceBox();
-    }
-
-    private void addToAttendanceBox() {
-        for (Attendance attendance : attendanceList) {
-            attendanceFieldModel.addElement(attendance.getCalendar().getClasses().getName()+"-"+attendance.getCalendar().getSubject().getCode());
-        }
-        attendanceField.setModel(attendanceFieldModel);
     }
 
     private void showDataTable() {
         model.setColumnIdentifiers(new Object[]{
-                "STT", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "KQ", "Kỳ", "Lý do"
+                "STT", "MSSV", "Họ tên", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Kỳ", "Lý do", "Tình trạng"
         });
         int i = 1;
         for (Application transcript : list) {
             model.addRow(new Object[]{
-                    i++, transcript.getAttendance().getCalendar().getClasses().getName()+"-"+transcript.getAttendance().getCalendar().getSubject().getCode(),
+                    i++,
+                    transcript.getAttendance().getStudent().getCode(), transcript.getAttendance().getStudent().getName(),
+                    transcript.getAttendance().getCalendar().getClasses().getName()+"-"+transcript.getAttendance().getCalendar().getSubject().getCode(),
                     transcript.getMiddleExpect(), transcript.getFinalExpect(), transcript.getOtherExpect(), transcript.getMarkExpect(),
                     transcript.getNewMiddle(), transcript.getNewFinal(), transcript.getNewOther(), transcript.getNewMark(),
-                    transcript.getStatus(),
                     CustomDate.serialize(transcript.getRemarking().getOpening())+"-"+CustomDate.serialize(transcript.getRemarking().getClosing()),
-                    transcript.getReason()
+                    transcript.getReason(),
+                    transcript.getStatus()
             });
         }
 
@@ -140,19 +112,19 @@ public class ApplicationForm extends JPanel {
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         applicationTable.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
         applicationTable.getColumnModel().getColumn(0).setPreferredWidth(20);
-        applicationTable.getColumnModel().getColumn(1).setPreferredWidth(90);
+        applicationTable.getColumnModel().getColumn(1).setPreferredWidth(35);
         applicationTable.addMouseListener(getDataRow());
 
         DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
         rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
-        applicationTable.getColumnModel().getColumn(2).setCellRenderer(rightRenderer);
-        applicationTable.getColumnModel().getColumn(3).setCellRenderer(rightRenderer);
         applicationTable.getColumnModel().getColumn(4).setCellRenderer(rightRenderer);
         applicationTable.getColumnModel().getColumn(5).setCellRenderer(rightRenderer);
         applicationTable.getColumnModel().getColumn(6).setCellRenderer(rightRenderer);
         applicationTable.getColumnModel().getColumn(7).setCellRenderer(rightRenderer);
         applicationTable.getColumnModel().getColumn(8).setCellRenderer(rightRenderer);
         applicationTable.getColumnModel().getColumn(9).setCellRenderer(rightRenderer);
+        applicationTable.getColumnModel().getColumn(10).setCellRenderer(rightRenderer);
+        applicationTable.getColumnModel().getColumn(11).setCellRenderer(rightRenderer);
 
     }
 
@@ -167,18 +139,24 @@ public class ApplicationForm extends JPanel {
 
                     selectedApplication = list.get(selectedRowIndex);
 
-                    attendanceField.setSelectedItem(model.getValueAt(selectedRowIndex, 1).toString());
-                    remarkingField.setSelectedItem(model.getValueAt(selectedRowIndex, 11).toString());
-
-                    if(model.getValueAt(selectedRowIndex, 2) != null)
-                        mdExpectField.setText(model.getValueAt(selectedRowIndex, 2).toString());
-                    if(model.getValueAt(selectedRowIndex, 3) != null)
-                        fnExpectField.setText(model.getValueAt(selectedRowIndex, 3).toString());
                     if(model.getValueAt(selectedRowIndex, 4) != null)
-                        otExpectField.setText(model.getValueAt(selectedRowIndex, 4).toString());
+                        mdExpectField.setText(model.getValueAt(selectedRowIndex, 4).toString());
                     if(model.getValueAt(selectedRowIndex, 5) != null)
-                        markExpectField.setText(model.getValueAt(selectedRowIndex, 5).toString());
-                    reasonField.setText(model.getValueAt(selectedRowIndex, 12).toString());
+                        fnExpectField.setText(model.getValueAt(selectedRowIndex, 5).toString());
+                    if(model.getValueAt(selectedRowIndex, 6) != null)
+                        otExpectField.setText(model.getValueAt(selectedRowIndex, 6).toString());
+                    if(model.getValueAt(selectedRowIndex, 7) != null)
+                        markExpectField.setText(model.getValueAt(selectedRowIndex, 7).toString());
+                    if(model.getValueAt(selectedRowIndex, 8) != null)
+                        mdMarkField.setText(model.getValueAt(selectedRowIndex, 8).toString());
+                    if(model.getValueAt(selectedRowIndex, 9) != null)
+                        fnMarkField.setText(model.getValueAt(selectedRowIndex, 9).toString());
+                    if(model.getValueAt(selectedRowIndex, 10) != null)
+                        otMarkField.setText(model.getValueAt(selectedRowIndex, 10).toString());
+                    if(model.getValueAt(selectedRowIndex, 11) != null)
+                        markField.setText(model.getValueAt(selectedRowIndex, 11).toString());
+                    if(model.getValueAt(selectedRowIndex, 14) != null)
+                        statusField.setSelectedItem(model.getValueAt(selectedRowIndex, 14).toString());
                 }
             }
 
@@ -231,174 +209,57 @@ public class ApplicationForm extends JPanel {
         }
     }
 
-
-    private void getTranscriptDetail() {
-        mdMarkField.setText("");
-        fnMarkField.setText("");
-        otMarkField.setText("");
-        markField.setText("");
-
-        String attendanceSelected = attendanceField.getSelectedItem().toString();
-        if (!attendanceSelected.equals("Chọn")) {
-            Attendance transcript = new Attendance();
-            for (Attendance s : attendanceList) {
-                String cl = s.getCalendar().getClasses().getName() + "-" + s.getCalendar().getSubject().getCode();
-                if (cl.equals(attendanceSelected)) {
-                    transcript = s;
-                    break;
-                }
-            }
-
-            if (transcript != null) {
-                if (transcript.getMiddleMark() != null)
-                    mdMarkField.setText(transcript.getMiddleMark().toString());
-                if (transcript.getFinalMark() != null)
-                    fnMarkField.setText(transcript.getFinalMark().toString());
-                if (transcript.getOtherMark() != null)
-                    otMarkField.setText(transcript.getOtherMark().toString());
-                if (transcript.getMark() != null)
-                    markField.setText(transcript.getMark().toString());
-            }
-        }
-    }
-
     private void save() {
         String rs = "Lưu thất bại!";
-        String remarkingSelected = remarkingField.getSelectedItem().toString();
-        String attendanceSelected = attendanceField.getSelectedItem().toString();
-        String middleMark = mdExpectField.getText().trim();
-        String finalMark = fnExpectField.getText().trim();
-        String otherMark = otExpectField.getText().trim();
-        String mark = markExpectField.getText().trim();
-        String reason = reasonField.getText().trim();
+        String status = statusField.getSelectedItem().toString();
+        String middleMark = mdMarkField.getText().trim();
+        String finalMark = fnMarkField.getText().trim();
+        String otherMark = otMarkField.getText().trim();
+        String mark = markField.getText().trim();
 
-        if (remarkingSelected == null || remarkingSelected.isEmpty()){
-            rs = "Không có lịch phúc khảo nào!";
+        Float newMiddle = null;
+        Float newFinal = null;
+        Float newOther = null;
+        Float newMark = null;
+
+        if (middleMark != null && !middleMark.isEmpty())
+            newMiddle = Float.parseFloat(middleMark);
+        if (finalMark != null && !finalMark.isEmpty())
+            newFinal = Float.parseFloat(finalMark);
+        if (otherMark != null && !otherMark.isEmpty())
+            newOther = Float.parseFloat(otherMark);
+        if (mark != null && !mark.isEmpty())
+            newMark = Float.parseFloat(mark);
+
+        boolean checkId = true;
+        boolean response = false;
+
+        if (selectedApplication != null) {
+            selectedApplication.setNewMiddle(newMiddle);
+            selectedApplication.setNewFinal(newFinal);
+            selectedApplication.setNewOther(newOther);
+            selectedApplication.setNewMark(newMark);
+            selectedApplication.setStatus(status);
+
+            response = controller.update(selectedApplication);
         }
-        else if(attendanceSelected == null || attendanceSelected.isEmpty()){
-            rs = "Không có môn nào được chọn!";
-        }
-        else if (reason.isEmpty()){
-            rs = "Vui lòng nhập lý do!";
-        }
-        else {
-            Float newMiddle = null;
-            Float newFinal = null;
-            Float newOther = null;
-            Float newMark = null;
 
-            if (middleMark != null && !middleMark.isEmpty())
-                newMiddle = Float.parseFloat(middleMark);
-            if (finalMark != null && !finalMark.isEmpty())
-                newFinal = Float.parseFloat(finalMark);
-            if (otherMark != null && !otherMark.isEmpty())
-                newOther = Float.parseFloat(otherMark);
-            if (mark != null && !mark.isEmpty())
-                newMark = Float.parseFloat(mark);
-
-            boolean checkId = true;
-            boolean response = false;
-
-            List<Application> newList = new ArrayList<>();
-            Remarking remarking = new Remarking();
-            for (Remarking c : remarkingList) {
-                String cl = CustomDate.serialize(c.getOpening()) + "-" + CustomDate.serialize(c.getClosing());
-                if (cl.equals(remarkingSelected)) {
-                    remarking = c;
-                    break;
+        if (checkId == true) {
+            if (response == true) {
+                if (selectedApplication != null) {
+                    model.setValueAt(middleMark, selectedRowIndex, 8);
+                    model.setValueAt(finalMark, selectedRowIndex, 9);
+                    model.setValueAt(otherMark, selectedRowIndex, 10);
+                    model.setValueAt(mark, selectedRowIndex, 11);
+                    model.setValueAt(status, selectedRowIndex, 14);
                 }
+
+                model.fireTableDataChanged();
+                applicationTable.repaint();
+                rs = "Lưu thành công!";
             }
-            Attendance attendance = new Attendance();
-            for (Attendance s : attendanceList) {
-                String cl = s.getCalendar().getClasses().getName() + "-" + s.getCalendar().getSubject().getCode();
-                if (cl.equals(attendanceSelected)) {
-                    attendance = s;
-                    break;
-                }
-            }
-            if (selectedApplication != null) {
-                selectedApplication.setAttendance(attendance);
-                selectedApplication.setRemarking(remarking);
-                selectedApplication.setMiddleExpect(newMiddle);
-                selectedApplication.setFinalExpect(newFinal);
-                selectedApplication.setOtherExpect(newOther);
-                selectedApplication.setMarkExpect(newMark);
-                selectedApplication.setReason(reason);
-
-                for (Application s : list) {
-                    if(selectedApplication.getStatus() == null) {
-                        if (selectedApplication.getRemarking().equals(s.getRemarking()) && selectedApplication.getAttendance().equals(s.getAttendance())) {
-                            newList.add(selectedApplication);
-                        } else {
-                            if (remarkingSelected.equals(CustomDate.serialize(s.getRemarking().getOpening()) + "-" + CustomDate.serialize(s.getRemarking().getClosing())) && attendanceSelected.equals(s.getAttendance().getCalendar().getClasses().getName() + "-" + s.getAttendance().getCalendar().getSubject().getCode())) {
-                                checkId = false;
-                                break;
-                            }
-                            newList.add(s);
-                        }
-                        if (checkId == true) {
-                            response = controller.update(selectedApplication);
-                        }
-                    }
-                    else {
-                        checkId = false;
-                        break;
-                    }
-                }
-            } else {
-                for (Application s : list) {
-                    if (remarkingSelected.equals(CustomDate.serialize(s.getRemarking().getOpening()) + "-" + CustomDate.serialize(s.getRemarking().getClosing())) && attendanceSelected.equals(s.getAttendance().getCalendar().getClasses().getName() + "-" + s.getAttendance().getCalendar().getSubject().getCode())) {
-                        checkId = false;
-                        break;
-                    }
-                }
-                if (checkId == true) {
-                    Application newApplication = new Application();
-                    newApplication.setRemarking(remarking);
-                    newApplication.setAttendance(attendance);
-                    newApplication.setMiddleExpect(newMiddle);
-                    newApplication.setFinalExpect(newFinal);
-                    newApplication.setOtherExpect(newOther);
-                    newApplication.setMarkExpect(newMark);
-                    newApplication.setReason(reason);
-                    response = controller.create(newApplication);
-                    newList = controller.getList();
-                }
-            }
-
-            if (checkId == true) {
-                if (response == true) {
-                    if (selectedApplication != null) {
-                        model.setValueAt(attendanceSelected, selectedRowIndex, 1);
-                        model.setValueAt(remarkingSelected, selectedRowIndex, 11);
-                        model.setValueAt(middleMark, selectedRowIndex, 2);
-                        model.setValueAt(finalMark, selectedRowIndex, 3);
-                        model.setValueAt(otherMark, selectedRowIndex, 4);
-                        model.setValueAt(mark, selectedRowIndex, 5);
-                        model.setValueAt(reason, selectedRowIndex, 12);
-                    } else {
-                        Integer i = 0;
-                        if (model.getRowCount() > 0) {
-                            i = Integer.parseInt(model.getValueAt(model.getRowCount() - 1, 0).toString());
-                        }
-                        model.addRow(new Object[]{
-                                ++i, attendanceSelected,
-                                middleMark, finalMark, otherMark, mark,
-                                null, null, null, null,
-                                null,
-                                remarkingSelected,
-                                reason
-                        });
-                    }
-
-                    model.fireTableDataChanged();
-                    applicationTable.repaint();
-                    rs = "Lưu thành công!";
-                    list = newList;
-                }
-            } else {
-                rs = "Đơn phúc khảo đã tồn tại!";
-            }
+        } else {
+            rs = "Đơn phúc khảo đã tồn tại!";
         }
 
         clickListener.showMessage(rs);
@@ -408,27 +269,22 @@ public class ApplicationForm extends JPanel {
     private void delete() {
         String rs = "Có lỗi xảy ra!";
         if (clickListener.deleteClick()) {
-            if (selectedApplication.getStatus() == null) {
-                List<Application> newList = new ArrayList<>();
-                if (selectedApplication != null) {
-                    for (Application s : list) {
-                        if (!(selectedApplication.getRemarking().equals(s.getRemarking()) && selectedApplication.getAttendance().equals(s.getAttendance()))) {
-                            newList.add(s);
-                        }
+            List<Application> newList = new ArrayList<>();
+            if (selectedApplication != null) {
+                for (Application s : list) {
+                    if (!(selectedApplication.getRemarking().equals(s.getRemarking()) && selectedApplication.getAttendance().equals(s.getAttendance()))) {
+                        newList.add(s);
                     }
                 }
-
-                boolean response = controller.delete(selectedApplication);
-                if (response == true) {
-                    model.removeRow(selectedRowIndex);
-                    model.fireTableDataChanged();
-                    applicationTable.repaint();
-                    rs = "Xóa thành công!";
-                    list = newList;
-                }
             }
-            else {
-                rs = "Không thể xóa!";
+
+            boolean response = controller.delete(selectedApplication);
+            if (response == true) {
+                model.removeRow(selectedRowIndex);
+                model.fireTableDataChanged();
+                applicationTable.repaint();
+                rs = "Xóa thành công!";
+                list = newList;
             }
             clickListener.showMessage(rs);
             this.refresh();
@@ -438,7 +294,7 @@ public class ApplicationForm extends JPanel {
     private void clearAll() {
         if (clickListener.deleteClick()) {
             String rs = "Có lỗi xảy ra!";
-            boolean response = controller.deleteAllByStudent(user.getUsername());
+            boolean response = controller.deleteAll();
             if (response == true) {
                 list.removeAll(list);
                 model.setRowCount(0);
@@ -460,24 +316,18 @@ public class ApplicationForm extends JPanel {
         fnExpectField.setText("");
         otExpectField.setText("");
         markExpectField.setText("");
-        reasonField.setText("");
-        attendanceField.setSelectedItem("Chọn");
+        statusField.setSelectedItem("Chọn");
         applicationTable.getSelectionModel().clearSelection();
     }
 
     private void initComponents() {
         panel = new JPanel();
 
-        titleLabel = new JLabel("ĐƠN PHÚC KHẢO");
+        titleLabel = new JLabel("DANH SÁCH PHÚC KHẢO");
         titleLabel.setFont(new Font("Arial", 1, 24));
         titleLabel.setForeground(new Color(26316));
         titleLabel.setHorizontalAlignment(JLabel.CENTER);
 
-        addButton = new JButton("+ Thêm mới");
-        addButton.addActionListener(e -> refresh());
-
-        remarkingLabel = new JLabel("Kỳ phúc khảo: ");
-        attendanceLabel = new JLabel("Môn học: ");
         mdMarkLabel = new JLabel("Điểm GK: ");
         fnMarkLabel = new JLabel("Điểm CK: ");
         otMarkLabel = new JLabel("Điểm khác: ");
@@ -486,7 +336,7 @@ public class ApplicationForm extends JPanel {
         fnExpectLabel = new JLabel("Phúc khảo điểm CK: ");
         otExpectLabel = new JLabel("Phúc khảo điểm khác: ");
         markExpectLabel = new JLabel("Phúc khảo điểm tổng: ");
-        reasonLabel = new JLabel("Lý do: ");
+        statusLabel = new JLabel("Tình trạng: ");
 
         mdMarkField = new JTextField();
         fnMarkField = new JTextField();
@@ -496,7 +346,6 @@ public class ApplicationForm extends JPanel {
         fnExpectField = new JTextField();
         otExpectField = new JTextField();
         markExpectField = new JTextField();
-        reasonField = new JTextField();
 
         saveButton = new JButton("Lưu lại");
         saveButton.addActionListener(e -> save());
@@ -507,15 +356,7 @@ public class ApplicationForm extends JPanel {
         resultBox = new JComboBox(new Object[]{"Tất cả", "Đã cập nhật điểm", "Không cập nhật điểm", "Chưa xem"});
         resultBox.addActionListener(e->filterResult());
 
-        remarkingField = new JComboBox(new DefaultComboBoxModel(
-
-        ));
-
-        attendanceField = new JComboBox(new DefaultComboBoxModel(
-
-        ));
-        attendanceField.addActionListener(e -> getTranscriptDetail());
-
+        statusField = new JComboBox(new Object[]{"Chưa xem", "Đã cập nhật điểm", "Không cập nhật điểm"});
 
         remarkingBox = new JComboBox();
         remarkingBox.setModel(new DefaultComboBoxModel(
@@ -533,7 +374,7 @@ public class ApplicationForm extends JPanel {
 
                 },
                 new String[]{
-                        "STT", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "KQ", "Kỳ", "Lý do"
+                        "STT", "MSSV", "Họ tên", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Kỳ", "Lý do", "Tình trạng"
                 }
         ){
             @Override
@@ -587,39 +428,11 @@ public class ApplicationForm extends JPanel {
 
         layout.setHorizontalGroup(
                 layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                        .addComponent(addButton)
                         .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addComponent(remarkingLabel)
-                                                .addComponent(remarkingField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
-                                        )
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(attendanceLabel)
-                                                .addComponent(attendanceField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
-                                        )
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(reasonLabel)
-                                                .addComponent(reasonField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
-                                        )
-                                )
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(mdMarkLabel)
-                                                .addComponent(mdMarkField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
-                                        )
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(fnMarkLabel)
-                                                .addComponent(fnMarkField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
-                                        )
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(otMarkLabel)
-                                                .addComponent(otMarkField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
-                                        )
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(markLabel)
-                                                .addComponent(markField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(statusLabel)
+                                                .addComponent(statusField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
                                         )
                                 )
                                 .addGap(18, 18, 18)
@@ -641,6 +454,26 @@ public class ApplicationForm extends JPanel {
                                                 .addComponent(markExpectField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
                                         )
                                 )
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(mdMarkLabel)
+                                                .addComponent(mdMarkField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
+                                        )
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(fnMarkLabel)
+                                                .addComponent(fnMarkField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
+                                        )
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(otMarkLabel)
+                                                .addComponent(otMarkField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
+                                        )
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(markLabel)
+                                                .addComponent(markField, GroupLayout.PREFERRED_SIZE, 178, GroupLayout.PREFERRED_SIZE)
+                                        )
+                                )
+
                         )
                         .addGap(18, 18, 18)
                         .addGroup(layout.createSequentialGroup()
@@ -674,40 +507,13 @@ public class ApplicationForm extends JPanel {
                         .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
                                 .addComponent(titleLabel)
-                                .addComponent(addButton)
                                 .addGap(18, 18, 18)
 
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                         .addGroup(layout.createSequentialGroup()
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(remarkingLabel)
-                                                        .addComponent(remarkingField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                                .addGap(18, 18, 18)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(attendanceLabel)
-                                                        .addComponent(attendanceField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                                .addGap(18, 18, 18)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(reasonLabel)
-                                                        .addComponent(reasonField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                                .addGap(18, 18, 18)
-                                        )
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(mdMarkLabel)
-                                                        .addComponent(mdMarkField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                                .addGap(18, 18, 18)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(fnMarkLabel)
-                                                        .addComponent(fnMarkField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                                .addGap(18, 18, 18)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(otMarkLabel)
-                                                        .addComponent(otMarkField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                                                .addGap(18, 18, 18)
-                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                                        .addComponent(markLabel)
-                                                        .addComponent(markField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                        .addComponent(statusLabel)
+                                                        .addComponent(statusField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                                 .addGap(18, 18, 18)
                                         )
                                         .addGroup(layout.createSequentialGroup()
@@ -728,6 +534,25 @@ public class ApplicationForm extends JPanel {
                                                         .addComponent(markExpectField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                                                 .addGap(25, 25, 25)
                                         )
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(mdMarkLabel)
+                                                        .addComponent(mdMarkField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addGap(18, 18, 18)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(fnMarkLabel)
+                                                        .addComponent(fnMarkField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addGap(18, 18, 18)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(otMarkLabel)
+                                                        .addComponent(otMarkField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addGap(18, 18, 18)
+                                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(markLabel)
+                                                        .addComponent(markField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                                                .addGap(18, 18, 18)
+                                        )
+
 
                                 )
                                 .addGroup(layout.createSequentialGroup()

@@ -25,7 +25,7 @@ public class TranscriptServiceImpl implements TranscriptService {
 
     @Override
     public boolean create(Attendance attendance){
-        return attendanceDao.addOne(attendance);
+        return attendanceDao.updateOne(attendance);
     }
 
     @Override
