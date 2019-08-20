@@ -88,9 +88,9 @@ public class CheckingForm extends JPanel {
     }
 
     private void showDataTable() {
-        model.setColumnIdentifiers(new Object[]{
-                "STT", "MSSV", "Họ tên", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Kỳ", "Lý do", "Tình trạng"
-        });
+//        model.setColumnIdentifiers(new Object[]{
+//                "STT", "MSSV", "Họ tên", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Kỳ", "Lý do", "Tình trạng"
+//        });
         int i = 1;
         for (Application transcript : list) {
             model.addRow(new Object[]{
@@ -374,7 +374,7 @@ public class CheckingForm extends JPanel {
 
                 },
                 new String[]{
-                        "STT", "MSSV", "Họ tên", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Kỳ", "Lý do", "Tình trạng"
+                        "STT", "MSSV", "Họ tên", "Môn học", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Kỳ", "Lý do", "Tình trạng"
                 }
         ){
             @Override
@@ -389,15 +389,15 @@ public class CheckingForm extends JPanel {
         };
         TableColumnModel cm = applicationTable.getColumnModel();
         ColumnGroup g_name = new ColumnGroup("Bảng điểm phúc khảo");
-        g_name.add(cm.getColumn(2));
-        g_name.add(cm.getColumn(3));
         g_name.add(cm.getColumn(4));
         g_name.add(cm.getColumn(5));
+        g_name.add(cm.getColumn(6));
+        g_name.add(cm.getColumn(7));
         ColumnGroup g_lang = new ColumnGroup("Bảng điểm sau phúc khảo");
-        g_lang.add(cm.getColumn(6));
-        g_lang.add(cm.getColumn(7));
         g_lang.add(cm.getColumn(8));
         g_lang.add(cm.getColumn(9));
+        g_lang.add(cm.getColumn(10));
+        g_lang.add(cm.getColumn(11));
 
         GroupableTableHeader header = (GroupableTableHeader)applicationTable.getTableHeader();
         header.addColumnGroup(g_name);

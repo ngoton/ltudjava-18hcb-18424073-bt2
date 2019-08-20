@@ -118,9 +118,9 @@ public class ApplicationForm extends JPanel {
     }
 
     private void showDataTable() {
-        model.setColumnIdentifiers(new Object[]{
-                "STT", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "KQ", "Kỳ", "Lý do"
-        });
+//        model.setColumnIdentifiers(new Object[]{
+//                "STT", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "KQ", "Kỳ", "Lý do"
+//        });
         int i = 1;
         for (Application transcript : list) {
             model.addRow(new Object[]{
@@ -533,7 +533,7 @@ public class ApplicationForm extends JPanel {
 
                 },
                 new String[]{
-                        "STT", "Môn học", "PK Điểm GK", "PK Điểm CK", "PK Điểm khác", "PK Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "KQ", "Kỳ", "Lý do"
+                        "STT", "Môn học", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "Điểm GK", "Điểm CK", "Điểm khác", "Điểm tổng", "KQ", "Kỳ", "Lý do"
                 }
         ){
             @Override
